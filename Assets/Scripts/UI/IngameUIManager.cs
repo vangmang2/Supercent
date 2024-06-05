@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIManager : MonoBehaviour
+public class IngameUIManager : MonoBehaviour
 {
     [SerializeField] RectTransform rtCanvas;
     [SerializeField] Camera uiCamera;
@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
         {
             joystick.SetActive(false);
         }
-        else
+        else if (Input.GetMouseButton(0))
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rtCanvas, Input.mousePosition, uiCamera, out var mousePos);
             joystick.SetStickPosition(mousePos);

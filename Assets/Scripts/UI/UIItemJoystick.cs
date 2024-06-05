@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,9 +10,21 @@ public class UIItemJoystick : MonoBehaviour
 
     Vector2 currentPosition;
 
+    event Action<float> onMove;
+
     private void Start()
     {
         SetActive(false);
+    }
+
+    public void SubscribeOnMove(Action<float> callback)
+    {
+        onMove += callback;
+    }
+
+    public void UnsubscribeOnMove(Action<float> callback)
+    {
+        onMove -= callback;
     }
 
     public UIItemJoystick SetPosition(Vector2 position)
@@ -35,6 +48,7 @@ public class UIItemJoystick : MonoBehaviour
         var targetPos = new Vector2(Mathf.Cos(deg) * distance, Mathf.Sin(deg) * distance);
 
         rtStick.anchoredPosition = targetPos;
+        onMove?.Invoke(deg);
         return this;
     }
 }
