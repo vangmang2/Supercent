@@ -215,7 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxCroassant: 12
-  force: {x: 0, y: 0, z: -45}
+  force: {x: 0, y: 0, z: -80}
 --- !u!1001 &48847866
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2846,17 +2846,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 16733709}
     m_Modifications:
+    - target: {fileID: 1577154671, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
+      propertyPath: io
+      value: 
+      objectReference: {fileID: 16733710}
     - target: {fileID: 4631719878341480406, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
       propertyPath: m_RootOrder
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4631719878341480406, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 3.57
-      objectReference: {fileID: 0}
-    - target: {fileID: 4631719878341480406, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 4.96
       objectReference: {fileID: 0}
     - target: {fileID: 4631719878341480406, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
       propertyPath: m_LocalPosition.x

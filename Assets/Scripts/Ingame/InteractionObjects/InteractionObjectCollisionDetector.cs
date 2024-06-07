@@ -8,10 +8,19 @@ public class InteractionObjectCollisionDetector : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision != null)
+        var player = collision.gameObject.GetComponent<Player>();
+        if (player != null)
         {
-            var player = collision.gameObject.GetComponent<Player>();
-            if (player != null) io.OnPlayerTouched(player);
+            io.OnPlayerEnter(player);
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        var player = collision.gameObject.GetComponent<Player>();
+        if (player != null)
+        {
+            io.OnPlayerExit(player);
         }
     }
 }

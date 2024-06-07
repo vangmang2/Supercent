@@ -4,6 +4,8 @@ using System.Collections;
 using UnityEngine;
 using Lean;
 using Lean.Pool;
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 public class Croassant : MonoBehaviour, IPoolable
 {
@@ -16,12 +18,17 @@ public class Croassant : MonoBehaviour, IPoolable
         return this;
     }
 
-    public Croassant SetGravityEnable(bool enable)
+    public Croassant DestroyRigidbody()
     {
-        rigidBody.useGravity = enable;
+        Destroy(rigidBody);
         return this;
     }
 
+    public Croassant SetParent(Transform parent)
+    {
+        transform.SetParent(parent);
+        return this;
+    }
 
     public void AddForce(Vector3 force)
     {
@@ -36,6 +43,38 @@ public class Croassant : MonoBehaviour, IPoolable
         });
     }
 
+    public void MoveToTargetWithCurve(Vector3 targetPos, float duration)
+    {
+        InvokeMoveToTargetWithCurve(targetPos, duration).Forget();
+    }
+
+    async UniTaskVoid InvokeMoveToTargetWithCurve(Vector3 targetPos, float duration)
+    {
+        var startPos = transform.localPosition;
+        var endPos = targetPos;
+
+        var centerPos = (startPos + endPos) * 0.5f ;
+        centerPos.y += 1.2f;
+
+        var startRot = transform.localRotation;
+        var targetRot = Quaternion.Euler(0f, 90f, 0f);
+
+        var t = 0f;
+        while (t <= 1f)
+        {
+            t += Time.deltaTime * (1f / duration);
+            var ac = Vector3.Lerp(startPos, centerPos, t);
+            var cb = Vector3.Lerp(centerPos, endPos, t);
+            var acb = Vector3.Lerp(ac, cb, t);
+
+            transform.localPosition = acb;
+            transform.localRotation = Quaternion.Lerp(startRot, targetRot, t);
+            await UniTask.Yield();
+        }
+
+        transform.localPosition = targetPos;
+    }
+
     public void OnSpawn()
     {
 
@@ -44,6 +83,9 @@ public class Croassant : MonoBehaviour, IPoolable
     public void OnDespawn()
     {
         SetColliderEnable(false);
-        SetGravityEnable(false);
+        rigidBody = gameObject.AddComponent<Rigidbody>();
+        rigidBody.mass = 0.15f;
+        rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
+        rigidBody.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 }
