@@ -43,21 +43,21 @@ public class Croassant : MonoBehaviour, IPoolable
         });
     }
 
-    public void MoveToTargetWithCurve(Vector3 targetPos, float duration)
+    public void MoveToTargetWithCurve(Vector3 targetPos, float duration, float targetRot = 90f)
     {
-        InvokeMoveToTargetWithCurve(targetPos, duration).Forget();
+        InvokeMoveToTargetWithCurve(targetPos, duration, targetRot).Forget();
     }
 
-    async UniTaskVoid InvokeMoveToTargetWithCurve(Vector3 targetPos, float duration)
+    async UniTaskVoid InvokeMoveToTargetWithCurve(Vector3 targetPos, float duration, float rot)
     {
         var startPos = transform.localPosition;
         var endPos = targetPos;
 
         var centerPos = (startPos + endPos) * 0.5f ;
-        centerPos.y += 1.2f;
+        centerPos.y += 2f;
 
         var startRot = transform.localRotation;
-        var targetRot = Quaternion.Euler(0f, 90f, 0f);
+        var targetRot = Quaternion.Euler(0f, rot, 0f);
 
         var t = 0f;
         while (t <= 1f)

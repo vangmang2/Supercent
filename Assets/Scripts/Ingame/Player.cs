@@ -43,4 +43,9 @@ public class Player : MonoBehaviour
     {
         croassants.Push(croassant);
     }
+
+    public Croassant PopCroassant()
+    {
+        return croassants.Pop();
+    }
 }

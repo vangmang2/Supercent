@@ -3508,6 +3508,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1795203800}
+  - component: {fileID: 1795203801}
   m_Layer: 0
   m_Name: Basket
   m_TagString: Untagged
@@ -3533,6 +3534,18 @@ Transform:
   m_Father: {fileID: 463924483}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1795203801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795203799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3e1d5e9b3cbbdd479c519a6d39e08e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1873144985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4287,6 +4300,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1795203800}
     m_Modifications:
+    - target: {fileID: 1577154671, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
+      propertyPath: io
+      value: 
+      objectReference: {fileID: 1795203801}
     - target: {fileID: 4631719878341480406, guid: 8252bada24d02344b8e55789ce43f914, type: 3}
       propertyPath: m_RootOrder
       value: 2
