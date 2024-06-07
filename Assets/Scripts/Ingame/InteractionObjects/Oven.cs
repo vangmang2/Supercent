@@ -4,11 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Oven : InteractionObject
 {
     [SerializeField] int maxCroassant;
-    [SerializeField] Vector3 force;
     public int currCroassantCount { get; private set; }
     CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>(ObjectPoolType.croassant);
     Vector3 spawnPos => new Vector3(-8.97500038f, 15.3870001f, -29.6599998f);
@@ -39,6 +39,7 @@ public class Oven : InteractionObject
         croassant.MoveToTarget(new Vector3(-8.97500038f, 15.3870001f, -30.3199997f), 1f, (croassant) =>
         {
             croassant.SetColliderEnable(true);
+            var force = new Vector3(Random.Range(-5f, 5f), 0f, -80f);
             croassant.AddForce(force);
         });
     }

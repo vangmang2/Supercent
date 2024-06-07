@@ -214,8 +214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14b9fadcb76db64aa9f15c181db3f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCroassant: 12
-  force: {x: 0, y: 0, z: -80}
+  maxCroassant: 15
 --- !u!1001 &48847866
 PrefabInstance:
   m_ObjectHideFlags: 0
