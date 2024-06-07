@@ -48,7 +48,7 @@ public class Basket : InteractionObject
             currCroassantCount++;
 
             croassant.SetParent(transform)
-                     .MoveToTargetWithCurve(targetPos, 0.5f);
+                     .MoveToTargetWithCurve(targetPos, 0.2f);
 
             cooldown = 0f;
         }
