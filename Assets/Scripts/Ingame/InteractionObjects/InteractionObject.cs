@@ -13,7 +13,7 @@ public abstract class InteractionObject : MonoBehaviour
 {
     [SerializeField] protected List<Transform> waitingPosList;
     public Vector3 position => transform.position;
-    public Vector3 GetPos(int index) => waitingPosList[index].position;
+    public abstract Vector3 GetPos(int index);
     public abstract InteractionObjectType interactionObjectType { get; }
     public abstract void OnInteractantEnter(Interactant interactant);
     public abstract void OnInteractantExit(Interactant interactant);

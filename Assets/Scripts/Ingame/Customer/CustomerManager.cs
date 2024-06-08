@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Video;
 
 // 손님 행동 로직
 // 1. 입장
@@ -41,7 +42,7 @@ public class CustomerManager : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
 
         var customer = pool.Spawn(new Vector3(0f, 0.916666746f, 15.666667f), Quaternion.Euler(0f, 180f, 0f), null);
-        customer.MoveToCroassant(ioManager.GetPos(InteractionObjectType.basket, currCustomerCount))
+        customer.MoveToTarget(ioManager.GetPos(InteractionObjectType.basket, currCustomerCount))
                 .SetActionOnMoveEnd(OnMoveToCroassantEnd);
         currCustomerCount++;
 
@@ -58,8 +59,9 @@ public class CustomerManager : MonoBehaviour
         customer.SetNeedsToCroassant()
                 .ShowNeeds(true);
 
-        customer.SetActionOnWaitForAction(OnCroassantReady);
-        customer.WaitForAction_Until(IsCroassantReady);
+        customer.SetActionOnWaitForAction(OnCroassantReady)
+                .WaitForAction_Until(IsCroassantReady);
+
         var basekt = ioManager.GetInteractionObject<Basket>(InteractionObjectType.basket);
         basekt.AddInteractant(customer);
     }
@@ -71,11 +73,31 @@ public class CustomerManager : MonoBehaviour
 
     void OnCroassantReady(Customer customer)
     {
-        Debug.Log("Ready!");
+        if (customer.currentNeeds.isGoingToTable)
+        {
+            // 1. 테이블이 언락되어 있으면 바로 테이블로 이동시켜줘야 한다.
+            // 2. 테이블에 누군가 있거나 치워지지 않은 상태면 일단 포스기로 와야 한다.
+        }
+        else
+        {
+            customer.SetNeedsToPos()
+                    .ShowNeeds(false);
+            var pos = ioManager.GetInteractionObject<Pos>(InteractionObjectType.pos);
+
+            customer.MoveToTarget(pos.paymentWatingStartPos + new Vector3(0f, 0f, pos.lineGap * pos.currPaymentWaitingCount))    
+                    .SetActionOnMoveEnd(OnMoveToPosEnd);
+
+            pos.IncreasePaymentWaitingCount()
+               .EnqueueCustomer(customer);
+
+        }
     }
 
-
-
+    void OnMoveToPosEnd(Customer customer)
+    {
+        var rot = Quaternion.Euler(0f, 180f, 0f);
+        customer.RotateTo(rot, 0.2f);
+    }
 
     private void OnDestroy()
     {

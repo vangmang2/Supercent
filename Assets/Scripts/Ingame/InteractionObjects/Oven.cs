@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -65,6 +64,11 @@ public class Oven : InteractionObject
     public override void OnInteractantExit(Interactant interactant)
     {
         interactants.Remove(interactant);
+    }
+
+    public override Vector3 GetPos(int index)
+    {
+        return Vector3.zero;
     }
 
     float cooldown;

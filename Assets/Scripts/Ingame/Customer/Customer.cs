@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 public enum Needs
 {
@@ -20,6 +21,7 @@ public struct CurrentNeeds
     public Needs needs;
     public int targetValue;
     public int currentValue;
+    public bool isGoingToTable;
 }
 
 public enum CustomerStep
@@ -33,12 +35,15 @@ public enum CustomerStep
 
 public class Customer : Interactant, IPoolable
 {
+    static int TableingCount = 0;
+
     [SerializeField] NavMeshAgent agent;
     [SerializeField] Animator animator;
 
     public CurrentNeeds currentNeeds;
 
     public Vector3 position => transform.position;
+    public Vector3 destination => agent.destination;
     public Vector3 up => transform.up;
 
     HUDCustomerNeeds customerNeeds;
@@ -61,14 +66,16 @@ public class Customer : Interactant, IPoolable
         customer.ShowNeeds(true);
     }
 
-    public void SetActionOnMoveEnd(Action<Customer> callback)
+    public Customer SetActionOnMoveEnd(Action<Customer> callback)
     {
         onMoveEnd = callback;
+        return this;
     }
 
-    public void SetActionOnWaitForAction(Action<Customer> callback)
+    public Customer SetActionOnWaitForAction(Action<Customer> callback)
     {
         onWaitForAction = callback;
+        return this;
     }
 
     public void WaitForAction_Until(Func<Customer, bool> predicate)
@@ -102,7 +109,22 @@ public class Customer : Interactant, IPoolable
         currentNeeds.needs = Needs.croassant;
         currentNeeds.targetValue = Random.Range(2, 4);
         currentNeeds.currentValue = 0;
+
+        currentNeeds.isGoingToTable = TableingCount == 2;
+
+        if (TableingCount >= 2)
+        {
+            TableingCount = 0;
+        }        
+        TableingCount++;
+
         SetMaxStackCount(currentNeeds.targetValue);
+        return this;
+    }
+
+    public Customer SetNeedsToPos()
+    {
+        currentNeeds.needs = Needs.pos;
         return this;
     }
 
@@ -115,17 +137,11 @@ public class Customer : Interactant, IPoolable
         return this;
     }
 
-
-    public Customer MoveToCroassant(Vector3 target)
-    {
-        MoveToTarget(target);
-        return this;
-    }
-
-    public void MoveToTarget(Vector3 target)
+    public Customer MoveToTarget(Vector3 target)
     {
         agent.SetDestination(target);
         InvokeMoveToTarget().Forget();
+        return this;
     }
 
     async UniTaskVoid InvokeMoveToTarget()
