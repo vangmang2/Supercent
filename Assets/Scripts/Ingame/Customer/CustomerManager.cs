@@ -54,7 +54,28 @@ public class CustomerManager : MonoBehaviour
         rot.x = 0f;
         rot.z = 0f;
         customer.RotateTo(rot, 0.2f);
+
+        customer.SetNeedsToCroassant()
+                .ShowNeeds(true);
+
+        customer.SetActionOnWaitForAction(OnCroassantReady);
+        customer.WaitForAction_Until(IsCroassantReady);
+        var basekt = ioManager.GetInteractionObject<Basket>(InteractionObjectType.basket);
+        basekt.AddInteractant(customer);
     }
+
+    bool IsCroassantReady(Customer customer)
+    {
+        return customer.currentNeeds.currentValue >= customer.currentNeeds.targetValue;
+    }
+
+    void OnCroassantReady(Customer customer)
+    {
+        Debug.Log("Ready!");
+    }
+
+
+
 
     private void OnDestroy()
     {

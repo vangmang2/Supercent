@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
 
 public class Basket : InteractionObject
@@ -15,6 +17,7 @@ public class Basket : InteractionObject
 
 
     Stack<Croassant> croassants = new Stack<Croassant>();
+    List<Interactant> interactants = new List<Interactant>();
 
     public Basket IncreaseWaitingCount()
     {
@@ -33,44 +36,73 @@ public class Basket : InteractionObject
         return waitingPosList[index].position;
     }
 
-    Player player;
-    public override void OnPlayerEnter(Player player)
+    public override void OnInteractantEnter(Interactant interactant)
     {
-        this.player = player;
+        AddInteractant(interactant);
     }
 
-    public override void OnPlayerExit(Player player)
+    public override void OnInteractantExit(Interactant interactant)
     {
-        this.player = null;
+        RemoveInteractant(interactant);
+    }
+
+    public void AddInteractant(Interactant interactant)
+    {
+        interactants.Add(interactant);
+    }
+
+    public void RemoveInteractant(Interactant interactant)
+    {
+        interactants.Remove(interactant);
     }
 
     float cooldown;
     private void Update()
     {
         cooldown += Time.deltaTime;
-        if (cooldown >= 0.1f)
+        if (cooldown >= 0.15f)
         {
-            if (player == null)
-                return;
+            foreach (var interactant in interactants)
+            {
+                if (interactant.interactantType == InteractantType.giver)
+                {
+                    if (interactant.currCroassantCount <= 0)
+                        continue;
 
-            if (player.currCroassantCount <= 0)
-                return;
+                    if (currCroassantCount >= maxStackCount)
+                        continue;
 
-            if (currCroassantCount >= maxStackCount)
-                return;
+                    var croassant = interactant.PopCroassant();
+                    var x = currCroassantCount % 2;
+                    var z = currCroassantCount / 2;
+                    var targetPos = stackStartPos + new Vector3(x * stackGap.x, 0f, z * stackGap.z);
 
-            var croassant = player.PopCroassant();
-            var x = currCroassantCount % 2;
-            var z = currCroassantCount / 2;
-            var targetPos = stackStartPos + new Vector3(x * stackGap.x, 0f, z * stackGap.z);
+                    croassants.Push(croassant);
+                    currCroassantCount++;
 
+                    croassant.SetParent(transform)
+                             .MoveToTargetWithCurve(targetPos, 0.2f);
+                }
+                else
+                {
+                    if (!interactant.CanPushCroassant())
+                        continue;
 
-            croassants.Push(croassant);
-            currCroassantCount++;
+                    if (croassants.Count <= 0)
+                        continue;
 
-            croassant.SetParent(transform)
-                     .MoveToTargetWithCurve(targetPos, 0.2f);
+                    var croassant = croassants.Pop();
+                    var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCroassantCount);
 
+                    interactant.PushCroassant(croassant);
+                    currCroassantCount--;
+
+                    croassant.SetParent(interactant.parent)
+                             .SetActiveCollider(false)
+                             .DestroyRigidbody()
+                             .MoveToTargetWithCurve(targetPos, 0.2f);
+                }
+            }
             cooldown = 0f;
         }
     }

@@ -1,21 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Interactant
 {
-    const int maxStack = 8;
-
     [SerializeField] Transform tfBody;
     [SerializeField] Rigidbody rigidBody;
     [SerializeField] float speed;
     [SerializeField] Animator animator;
 
-    public Transform parent => transform;
+    public override InteractantType interactantType => InteractantType.giver;
 
-    Stack<Croassant> croassants = new Stack<Croassant>();
-    public int currCroassantCount => croassants.Count;
-    public Vector3 stackStartPos => new Vector3(0f, 0.643999994f, 0.470999986f);
-    public float stackGap => 0.277f;
+    private void Start()
+    {
+        SetMaxStackCount(8);
+    }
 
     public void MoveToTargetRot(float rot)
     {
@@ -32,20 +30,5 @@ public class Player : MonoBehaviour
     private void Update()
     {
         animator.SetBool("IsHoldingSomething", croassants.Count > 0);
-    }
-
-    public bool CanPushCroassant()
-    {
-        return (croassants.Count < maxStack);
-    }
-
-    public void PushCroassant(Croassant croassant)
-    {
-        croassants.Push(croassant);
-    }
-
-    public Croassant PopCroassant()
-    {
-        return croassants.Pop();
     }
 }

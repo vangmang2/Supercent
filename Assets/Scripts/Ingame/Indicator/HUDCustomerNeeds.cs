@@ -8,6 +8,7 @@ public class HUDCustomerNeeds : Indicator
     [SerializeField] Sprite croassant, pos, table;
     [SerializeField] Image imgNeeds;
     [SerializeField] TMP_Text txtValue;
+    [SerializeField] float revision;
 
     public void SetActive(bool enable)
     {
@@ -46,6 +47,7 @@ public class HUDCustomerNeeds : Indicator
     public override void IndicateTarget(Camera mainCamera, Camera uiCamera, Vector2 canvasSize)
     {
         var indicatedPos = uiCamera.IndicateTarget(mainCamera, target, canvasSize, out var isOutOfBorder);
+        indicatedPos.y += revision;
         rtTransform.anchoredPosition = indicatedPos;
     }
 }

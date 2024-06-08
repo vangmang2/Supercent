@@ -19,6 +19,7 @@ public class Oven : InteractionObject
     CancellationTokenSource cts;
 
     Stack<Croassant> croassants = new Stack<Croassant>();
+    List<Interactant> interactants = new List<Interactant>();
 
     public void Start()
     {
@@ -54,42 +55,43 @@ public class Oven : InteractionObject
         croassants.Push(croassant);
     }
 
-    Player player;
-    public override void OnPlayerEnter(Player player)
+    public override void OnInteractantEnter(Interactant interactant)
     {
-        this.player = player;
+        if (interactant.interactantType != InteractantType.giver)
+            return;
+        interactants.Add(interactant);
     }
 
-    public override void OnPlayerExit(Player player)
+    public override void OnInteractantExit(Interactant interactant)
     {
-        this.player = null;
+        interactants.Remove(interactant);
     }
 
     float cooldown;
     private void Update()
     {
         cooldown += Time.deltaTime;
-        if (cooldown >= 0.1f)
+        if (cooldown >= 0.15f)
         {
-            if (player == null)
-                return;
+            foreach (var interactant in interactants)
+            {
+                if (!interactant.CanPushCroassant())
+                    continue;
 
-            if (!player.CanPushCroassant())
-                return;
+                if (croassants.Count <= 0)
+                    continue;
 
-            if (croassants.Count <= 0)
-                return;
+                var croassant = croassants.Pop();
+                var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCroassantCount);
 
-            var croassant = croassants.Pop();
-            var targetPos = player.stackStartPos + new Vector3(0f, player.stackGap * player.currCroassantCount);
+                interactant.PushCroassant(croassant);
+                currCroassantCount--;
 
-            player.PushCroassant(croassant);
-            currCroassantCount--;
-
-            croassant.SetParent(player.parent)
-                     .SetActiveCollider(false)
-                     .DestroyRigidbody()
-                     .MoveToTargetWithCurve(targetPos, 0.2f);
+                croassant.SetParent(interactant.parent)
+                         .SetActiveCollider(false)
+                         .DestroyRigidbody()
+                         .MoveToTargetWithCurve(targetPos, 0.2f);
+            }
 
             cooldown = 0f;
         }

@@ -33,4 +33,8 @@ public class InteractionObjectManager : MonoBehaviour
         return ioDic[type].GetPos(index);
     }
 
+    public T GetInteractionObject<T>(InteractionObjectType type) where T : InteractionObject
+    {
+        return ioDic[type] as T;
+    }
 }
