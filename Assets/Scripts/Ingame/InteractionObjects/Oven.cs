@@ -8,10 +8,14 @@ using Random = UnityEngine.Random;
 
 public class Oven : InteractionObject
 {
+    public override InteractionObjectType interactionObjectType => InteractionObjectType.oven;
+
     [SerializeField] int maxCroassant;
     public int currCroassantCount { get; private set; }
     CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>(ObjectPoolType.croassant);
     Vector3 spawnPos => new Vector3(-5.94999981f, 1.74300003f, -2.3900001f);
+
+
     CancellationTokenSource cts;
 
     Stack<Croassant> croassants = new Stack<Croassant>();
@@ -38,7 +42,7 @@ public class Oven : InteractionObject
         InvokePushCroassant(croassant).Forget();
         croassant.MoveToTarget(new Vector3(-5.94999981f, 1.74300003f, -3.60100007f), 1f, (croassant) =>
         {
-            croassant.SetColliderEnable(true);
+            croassant.SetActiveCollider(true);
             var force = new Vector3(Random.Range(-5f, 5f), 0f, -80f);
             croassant.AddForce(force);
         });
@@ -83,7 +87,7 @@ public class Oven : InteractionObject
             currCroassantCount--;
 
             croassant.SetParent(player.parent)
-                     .SetColliderEnable(false)
+                     .SetActiveCollider(false)
                      .DestroyRigidbody()
                      .MoveToTargetWithCurve(targetPos, 0.2f);
 

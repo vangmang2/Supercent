@@ -1,3 +1,4 @@
+using Lean.Pool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public enum ObjectPoolType
 {
     croassant,
+    customer
 }
 
 public class PoolContainer : MonoBehaviour
@@ -33,7 +35,14 @@ public class PoolContainer : MonoBehaviour
     }
 }
 
+[RequireComponent(typeof(LeanGameObjectPool))]
 public abstract class ObjectPool : MonoBehaviour
 {
+    protected LeanGameObjectPool pool;
     public abstract ObjectPoolType poolType { get; }
+
+    private void Start()
+    {
+        pool = GetComponent<LeanGameObjectPool>();
+    }
 }

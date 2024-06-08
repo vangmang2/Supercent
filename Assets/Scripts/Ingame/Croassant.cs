@@ -12,7 +12,7 @@ public class Croassant : MonoBehaviour, IPoolable
     [SerializeField] new Collider collider;
     [SerializeField] Rigidbody rigidBody;
 
-    public Croassant SetColliderEnable(bool enable)
+    public Croassant SetActiveCollider(bool enable)
     {
         collider.enabled = enable;
         return this;
@@ -82,7 +82,7 @@ public class Croassant : MonoBehaviour, IPoolable
 
     public void OnDespawn()
     {
-        SetColliderEnable(false);
+        SetActiveCollider(false);
         rigidBody = gameObject.AddComponent<Rigidbody>();
         rigidBody.mass = 0.15f;
         rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
