@@ -43,10 +43,12 @@ public abstract class Interactant : MonoBehaviour
     {
         croassants.Push(croassant);
         onPushCroassant?.Invoke(this);
+        SoundManager.instance.PlaySFX(SoundType.getObject);
     }
 
     public Croassant PopCroassant()
     {
+        SoundManager.instance.PlaySFX(SoundType.putObject);
         return croassants.Pop();
     }
 }
