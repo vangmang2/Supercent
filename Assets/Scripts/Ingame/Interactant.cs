@@ -16,17 +16,17 @@ public abstract class Interactant : MonoBehaviour
     public abstract InteractantType interactantType { get; }
     int maxStack;
 
-    protected Stack<Croassant> croassants = new Stack<Croassant>();
-    public int currCroassantCount => croassants.Count;
+    protected Stack<CarriableObject> coStack = new Stack<CarriableObject>();
+    public int currCOCount => coStack.Count;
     public Vector3 stackStartPos => new Vector3(0f, 0.643999994f, 0.470999986f);
     public float stackGap => 0.277f;
     public Transform parent => transform;
 
-    Action<Interactant> onPushCroassant;
+    Action<Interactant> onPushCO;
 
-    public void SetActionOnPushCroassant(Action<Interactant> callback)
+    public void SetActionOnPushCarriableObject(Action<Interactant> callback)
     {
-        onPushCroassant = callback;
+        onPushCO = callback;
     }
 
     protected void SetMaxStackCount(int count)
@@ -36,19 +36,19 @@ public abstract class Interactant : MonoBehaviour
 
     public bool CanPushCroassant()
     {
-        return (croassants.Count < maxStack);
+        return (coStack.Count < maxStack);
     }
 
-    public void PushCroassant(Croassant croassant)
+    public void PushCarriableObject(CarriableObject carriableObject, SoundType soundType = SoundType.getObject)
     {
-        croassants.Push(croassant);
-        onPushCroassant?.Invoke(this);
-        SoundManager.instance.PlaySFX(SoundType.getObject);
+        coStack.Push(carriableObject);
+        onPushCO?.Invoke(this);
+        SoundManager.instance.PlaySFX(soundType);
     }
 
-    public Croassant PopCroassant()
+    public CarriableObject PopCarriableObject(SoundType soundType = SoundType.putObject)
     {
-        SoundManager.instance.PlaySFX(SoundType.putObject);
-        return croassants.Pop();
+        SoundManager.instance.PlaySFX(soundType);
+        return coStack.Pop();
     }
 }

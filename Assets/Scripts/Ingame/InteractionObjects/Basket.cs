@@ -53,18 +53,18 @@ public class Basket : InteractionObject
             {
                 if (interactant.interactantType == InteractantType.giver)
                 {
-                    if (interactant.currCroassantCount <= 0)
+                    if (interactant.currCOCount <= 0)
                         continue;
 
                     if (currCroassantCount >= maxStackCount)
                         continue;
 
-                    var croassant = interactant.PopCroassant();
+                    var croassant = interactant.PopCarriableObject();
                     var x = currCroassantCount % 2;
                     var z = currCroassantCount / 2;
                     var targetPos = stackStartPos + new Vector3(x * stackGap.x, 0f, z * stackGap.z);
 
-                    croassants.Push(croassant);
+                    croassants.Push(croassant as Croassant);
                     currCroassantCount++;
 
                     croassant.SetParent(transform)
@@ -79,13 +79,13 @@ public class Basket : InteractionObject
                         continue;
 
                     var croassant = croassants.Pop();
-                    var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCroassantCount);
+                    var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCOCount);
 
-                    interactant.PushCroassant(croassant);
+                    interactant.PushCarriableObject(croassant);
                     currCroassantCount--;
 
-                    croassant.SetParent(interactant.parent)
-                             .SetActiveCollider(false)
+                    croassant.SetParent(interactant.parent);
+                    croassant.SetActiveCollider(false)
                              .DestroyRigidbody()
                              .MoveToTargetWithCurve(targetPos, 0.2f);
                 }

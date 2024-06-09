@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class CustomerPool : ObjectPool
 {
-    public override ObjectPoolType poolType => ObjectPoolType.customer;
-
     public Customer Spawn(Vector3 pos, Quaternion rot, Action<Customer> onSpawn)
     {
         var customer = pool.Spawn<Customer>(pos, rot, null, true);

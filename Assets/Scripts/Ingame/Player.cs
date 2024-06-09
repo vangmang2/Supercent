@@ -29,6 +29,6 @@ public class Player : Interactant
 
     private void Update()
     {
-        animator.SetBool("IsHoldingSomething", croassants.Count > 0);
+        animator.SetBool("IsHoldingSomething", coStack.Count > 0);
     }
 }

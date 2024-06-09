@@ -56,7 +56,7 @@ public class Customer : Interactant, IPoolable
 
     void Start()
     {
-        SetActionOnPushCroassant(OnPushCroassant);
+        SetActionOnPushCarriableObject(OnPushCroassant);
     }
 
     void OnPushCroassant(Interactant interactant)
@@ -101,7 +101,7 @@ public class Customer : Interactant, IPoolable
     private void Update()
     {
         animator.SetBool("Move", agent.velocity.magnitude > 0.1f);
-        animator.SetBool("IsHoldingSomething", croassants.Count > 0);
+        animator.SetBool("IsHoldingSomething", coStack.Count > 0);
     }
 
     public Customer SetNeedsToCroassant()
@@ -137,6 +137,12 @@ public class Customer : Interactant, IPoolable
         return this;
     }
 
+    public Customer HideNeeds()
+    {
+        customerNeeds.SetActive(false);
+        return this;
+    }
+
     public Customer MoveToTarget(Vector3 target)
     {
         agent.SetDestination(target);
@@ -146,9 +152,9 @@ public class Customer : Interactant, IPoolable
 
     async UniTaskVoid InvokeMoveToTarget()
     {
-        await UniTask.WaitUntil(() => agent.remainingDistance <= 0.05f);
+        // 에이전트 업데이트가 바로바로 되지 않는 듯 하다. RemainingDistance에 완전히 의존 불가능.
+        await UniTask.WaitUntil(() => agent.remainingDistance <= 0.05f && (transform.position - agent.destination).magnitude <= 0.05f);
         onMoveEnd?.Invoke(this);
-
     }
 
     public void RotateTo(Quaternion rot, float duration)
@@ -156,25 +162,20 @@ public class Customer : Interactant, IPoolable
         transform.DORotateQuaternion(rot, duration);
     }
 
-    public void DespawnHUDNeeds()
-    {
-        CustomerNeedsManager.instance.Despawn(customerNeeds);
-    }
-
     public void OnDespawn()
     {
-        SetAgentActive(false);
+        CustomerNeedsManager.instance.Despawn(customerNeeds);
+        onMoveEnd = null;
+        onWaitForAction = null;
+
+        // 종이 가방도 디스폰해줘야 함
+        var bag = coStack.Pop() as PaperBag;
+        PoolContainer.instance.GetPool<PaperBagPool>().Despawn(bag);
     }
 
     public Customer SetDestination(Vector3 target)
     {
         agent.SetDestination(target);
-        return this;
-    }
-
-    public Customer SetAgentActive(bool enable)
-    {
-        agent.enabled = enable;
         return this;
     }
 }

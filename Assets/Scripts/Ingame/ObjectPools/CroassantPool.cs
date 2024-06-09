@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class CroassantPool : ObjectPool
 {
-    public override ObjectPoolType poolType => ObjectPoolType.croassant;
-
     public Croassant Spawn(Vector3 pos, Quaternion rot, Action<Croassant> onSpawn)
     {
         var croassant = pool.Spawn<Croassant>(pos, rot, null, true);

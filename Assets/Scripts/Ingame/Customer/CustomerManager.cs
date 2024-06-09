@@ -26,8 +26,9 @@ public class CustomerManager : MonoBehaviour
                                     // TODO: 총 인원이 아니지만 마땅한 이름이 생각나지 않아서 일단 maxCustomerCount로 명명. 나중에 좋은 이름 생각나면 바꾸자
 
     [SerializeField] InteractionObjectManager ioManager;
-    CustomerPool pool => PoolContainer.instance.GetPool<CustomerPool>(ObjectPoolType.customer);
+    CustomerPool pool => PoolContainer.instance.GetPool<CustomerPool>();
     int currCustomerCount;
+    int rotationCount;
     CancellationTokenSource cts;
 
     private void Start()
@@ -42,9 +43,13 @@ public class CustomerManager : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
 
         var customer = pool.Spawn(new Vector3(0f, 0.916666746f, 15.666667f), Quaternion.Euler(0f, 180f, 0f), null);
-        customer.MoveToTarget(ioManager.GetPos(InteractionObjectType.basket, currCustomerCount))
+        customer.MoveToTarget(ioManager.GetPos(InteractionObjectType.basket, rotationCount))
                 .SetActionOnMoveEnd(OnMoveToCroassantEnd);
         currCustomerCount++;
+        rotationCount++;
+
+        if (rotationCount >= maxCustomerCount)
+            rotationCount = 0;
 
         InvokeCustomerSpawn().Forget();
     }
@@ -73,6 +78,9 @@ public class CustomerManager : MonoBehaviour
 
     void OnCroassantReady(Customer customer)
     {
+        var basekt = ioManager.GetInteractionObject<Basket>(InteractionObjectType.basket);
+        basekt.RemoveInteractant(customer);
+
         if (customer.currentNeeds.isGoingToTable)
         {
             // 1. 테이블이 언락되어 있으면 바로 테이블로 이동시켜줘야 한다.
@@ -87,9 +95,11 @@ public class CustomerManager : MonoBehaviour
             customer.MoveToTarget(pos.paymentWatingStartPos + new Vector3(0f, 0f, pos.lineGap * pos.currPaymentWaitingCount))    
                     .SetActionOnMoveEnd(OnMoveToPosEnd);
 
-            pos.IncreasePaymentWaitingCount()
+            pos.SetActionOnPay(OnPay)
+               .IncreasePaymentWaitingCount()
                .EnqueueCustomer(customer);
 
+            currCustomerCount--;
         }
     }
 
@@ -98,6 +108,50 @@ public class CustomerManager : MonoBehaviour
         var rot = Quaternion.Euler(0f, 180f, 0f);
         customer.RotateTo(rot, 0.2f);
     }
+
+    void OnPay(Pos pos, Customer customer, PaperBag bag)
+    {
+        InvokePayment(pos, customer, bag).Forget();
+    }
+
+    async UniTaskVoid InvokePayment(Pos pos,Customer customer, PaperBag bag)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(0.15f));
+        while (customer.currCOCount > 0)
+        {
+            var croassant = customer.PopCarriableObject();
+            croassant.SetParent(bag.transform)
+                     .MoveToTargetWithCurve(bag.localPosition, 0.2f, height: 3f, onComplete: (croassant) => croassant.SetActive(false));
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
+        }
+
+        await UniTask.Delay(TimeSpan.FromSeconds(0.15f));
+        bag.PlayCloseAnim();
+
+        // 손님 퇴장
+        pos.DequeueCustomer();
+        pos.PullCustomersLine();
+
+        customer.SetActionOnPushCarriableObject(null);
+        customer.PushCarriableObject(bag);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(0.4f));
+        // TODO: 행복 이모티콘 띄우기
+        bag.SetParent(customer.transform);
+        bag.MoveToTargetWithCurve(new Vector3(0f, 0.819999993f, 0.730000019f), 0.2f, targetRot: 0f, onComplete: (carriableObject) =>
+        {
+            customer.HideNeeds()
+                    .MoveToTarget(new Vector3(-0.360000014f, 0.50999999f, 14.1199999f))
+                    .SetActionOnMoveEnd(DespawnCustomer);
+
+            void DespawnCustomer(Customer customer)
+            {
+                pool.Despawn(customer);
+            }
+        });
+    }
+
+
 
     private void OnDestroy()
     {

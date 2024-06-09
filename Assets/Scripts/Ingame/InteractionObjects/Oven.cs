@@ -11,7 +11,7 @@ public class Oven : InteractionObject
 
     [SerializeField] int maxCroassant;
     public int currCroassantCount { get; private set; }
-    CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>(ObjectPoolType.croassant);
+    CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>();
     Vector3 spawnPos => new Vector3(-5.94999981f, 1.74300003f, -2.3900001f);
 
 
@@ -40,8 +40,9 @@ public class Oven : InteractionObject
     void OnSpawnCroassant(Croassant croassant)
     {
         InvokePushCroassant(croassant).Forget();
-        croassant.MoveToTarget(new Vector3(-5.94999981f, 1.74300003f, -3.60100007f), 1f, (croassant) =>
+        croassant.MoveToTarget(new Vector3(-5.94999981f, 1.74300003f, -3.60100007f), 1f, (_croassant) =>
         {
+            var croassant = _croassant as Croassant;
             croassant.SetActiveCollider(true);
             var force = new Vector3(Random.Range(-5f, 5f), 0f, -80f);
             croassant.AddForce(force);
@@ -86,13 +87,13 @@ public class Oven : InteractionObject
                     continue;
 
                 var croassant = croassants.Pop();
-                var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCroassantCount);
+                var targetPos = interactant.stackStartPos + new Vector3(0f, interactant.stackGap * interactant.currCOCount);
 
-                interactant.PushCroassant(croassant);
+                interactant.PushCarriableObject(croassant);
                 currCroassantCount--;
 
-                croassant.SetParent(interactant.parent)
-                         .SetActiveCollider(false)
+                croassant.SetParent(interactant.parent);
+                croassant.SetActiveCollider(false)
                          .DestroyRigidbody()
                          .MoveToTargetWithCurve(targetPos, 0.2f);
             }
