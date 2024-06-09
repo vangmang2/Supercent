@@ -7,7 +7,8 @@ public enum InteractionObjectType
 {
     basket,
     pos,
-    oven
+    oven,
+    table
 }
 public abstract class InteractionObject : MonoBehaviour
 {
