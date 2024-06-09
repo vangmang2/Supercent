@@ -3,25 +3,39 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class HUDCustomerNeeds : Indicator
+public class HUDCustomerStates : Indicator
 {
     [SerializeField] Sprite croassant, pos, table;
     [SerializeField] Image imgNeeds;
     [SerializeField] TMP_Text txtValue;
     [SerializeField] float revision;
 
+    [SerializeField] GameObject goNeeds, goHappyFace;
+
     public void SetActive(bool enable)
     {
         gameObject.SetActive(enable);
     }
 
-    public HUDCustomerNeeds SetActiveValue(bool enable)
+    public HUDCustomerStates SetActiveNeeds(bool enable)
+    {
+        goNeeds.SetActive(enable);
+        return this;
+    }
+
+    public HUDCustomerStates SetActiveHappyFace(bool enable)
+    {
+        goHappyFace.SetActive(enable);
+        return this;
+    }
+
+    public HUDCustomerStates SetActiveValue(bool enable)
     {
         txtValue.gameObject.SetActive(enable);
         return this;
     }
 
-    public HUDCustomerNeeds SetNeedsSprite(Needs needs)
+    public HUDCustomerStates SetNeedsSprite(Needs needs)
     {
         switch (needs)
         {
@@ -38,7 +52,7 @@ public class HUDCustomerNeeds : Indicator
         return this;
     }
 
-    public HUDCustomerNeeds SetValueText(string text)
+    public HUDCustomerStates SetValueText(string text)
     { 
         txtValue.SetText(text);
         return this;

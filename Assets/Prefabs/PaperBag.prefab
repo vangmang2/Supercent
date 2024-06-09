@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155096324c5d8d34aaa96519503bb40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tfBone: {fileID: 4720814885191872232}
   animator: {fileID: 1781304169609770392}
 --- !u!95 &1781304169609770392
 Animator:

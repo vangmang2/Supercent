@@ -46,7 +46,7 @@ public class Customer : Interactant, IPoolable
     public Vector3 destination => agent.destination;
     public Vector3 up => transform.up;
 
-    HUDCustomerNeeds customerNeeds;
+    HUDCustomerStates customerNeeds;
     Action<Customer> onMoveEnd;
     Action<Customer> onWaitForAction;
     public CustomerStep customerStep { get; private set; } // 스텝에 따라 손님의 행동이 달라진다
@@ -78,6 +78,11 @@ public class Customer : Interactant, IPoolable
         return this;
     }
 
+    void SetAgentAvoidQuality(ObstacleAvoidanceType type)
+    {
+        agent.obstacleAvoidanceType = type;
+    }
+
     public void WaitForAction_Until(Func<Customer, bool> predicate)
     {
         cts?.Cancel();
@@ -93,8 +98,21 @@ public class Customer : Interactant, IPoolable
 
     public void OnSpawn()
     {
-        customerNeeds = CustomerNeedsManager.instance.Spawn(transform);
+        customerNeeds = CustomerStatesManager.instance.Spawn(transform);
         customerNeeds.SetActive(false);
+        SetAgentAvoidQuality(ObstacleAvoidanceType.HighQualityObstacleAvoidance);
+    }
+
+    public void OnDespawn()
+    {
+        SetAgentAvoidQuality(ObstacleAvoidanceType.NoObstacleAvoidance);
+        CustomerStatesManager.instance.Despawn(customerNeeds);
+        onMoveEnd = null;
+        onWaitForAction = null;
+
+        // 종이 가방도 디스폰해줘야 함
+        var bag = coStack.Pop() as PaperBag;
+        PoolContainer.instance.GetPool<PaperBagPool>().Despawn(bag);
     }
 
 
@@ -130,16 +148,19 @@ public class Customer : Interactant, IPoolable
 
     public Customer ShowNeeds(bool showValue)
     {
-        customerNeeds.SetNeedsSprite(currentNeeds.needs)
+        customerNeeds.SetActiveNeeds(true)
+                     .SetActiveHappyFace(false)
+                     .SetNeedsSprite(currentNeeds.needs)
                      .SetValueText((currentNeeds.targetValue - currentNeeds.currentValue).ToString())
                      .SetActiveValue(showValue)
                      .SetActive(true);
         return this;
     }
 
-    public Customer HideNeeds()
+    public Customer ShowHappyFace()
     {
-        customerNeeds.SetActive(false);
+        customerNeeds.SetActiveHappyFace(true)
+                     .SetActiveNeeds(false);
         return this;
     }
 
@@ -160,17 +181,6 @@ public class Customer : Interactant, IPoolable
     public void RotateTo(Quaternion rot, float duration)
     {
         transform.DORotateQuaternion(rot, duration);
-    }
-
-    public void OnDespawn()
-    {
-        CustomerNeedsManager.instance.Despawn(customerNeeds);
-        onMoveEnd = null;
-        onWaitForAction = null;
-
-        // 종이 가방도 디스폰해줘야 함
-        var bag = coStack.Pop() as PaperBag;
-        PoolContainer.instance.GetPool<PaperBagPool>().Despawn(bag);
     }
 
     public Customer SetDestination(Vector3 target)

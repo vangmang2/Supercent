@@ -4,32 +4,32 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class CustomerNeedsManager : MonoBehaviour
+public class CustomerStatesManager : MonoBehaviour
 {
-    public static CustomerNeedsManager instance { get; private set; }
+    public static CustomerStatesManager instance { get; private set; }
 
 
-    [SerializeField] HUDCustomerNeeds indicatorPrefab;
+    [SerializeField] HUDCustomerStates indicatorPrefab;
     [SerializeField] Transform indicatorParent;
     [SerializeField] Camera mainCamera, uiCamera;
     [SerializeField] RectTransform rtCanvas;
 
-    List<HUDCustomerNeeds> indicatorList = new List<HUDCustomerNeeds>();
+    List<HUDCustomerStates> indicatorList = new List<HUDCustomerStates>();
 
     private void Awake()
     {
         instance = this;
     }
 
-    public HUDCustomerNeeds Spawn(Transform target)
+    public HUDCustomerStates Spawn(Transform target)
     {
-        var indicator = Instantiate(indicatorPrefab, indicatorParent).GetComponent<HUDCustomerNeeds>();
+        var indicator = Instantiate(indicatorPrefab, indicatorParent).GetComponent<HUDCustomerStates>();
         indicator.SetTarget(target);
         indicatorList.Add(indicator);
         return indicator;
     }
 
-    public void Despawn(HUDCustomerNeeds indicator)
+    public void Despawn(HUDCustomerStates indicator)
     {
         if (indicator == null) return;
         indicatorList.Remove(indicator);

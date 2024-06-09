@@ -140,7 +140,7 @@ public class CustomerManager : MonoBehaviour
         bag.SetParent(customer.transform);
         bag.MoveToTargetWithCurve(new Vector3(0f, 0.819999993f, 0.730000019f), 0.2f, targetRot: 0f, onComplete: (carriableObject) =>
         {
-            customer.HideNeeds()
+            customer.ShowHappyFace()
                     .MoveToTarget(new Vector3(-0.360000014f, 0.50999999f, 14.1199999f))
                     .SetActionOnMoveEnd(DespawnCustomer);
 
