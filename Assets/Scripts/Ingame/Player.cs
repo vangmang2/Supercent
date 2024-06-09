@@ -16,7 +16,7 @@ public class Player : Interactant
         onCoinChanged = callback;
     }
 
-    public void IncreaseCoin(int amount)
+    public void IncreaseMoney(int amount)
     {
         coin += amount;
         onCoinChanged?.Invoke(coin);

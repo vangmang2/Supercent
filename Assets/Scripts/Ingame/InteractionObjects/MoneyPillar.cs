@@ -8,11 +8,11 @@ public class MoneyPillar : InteractionObject
     public MoneyStackPool moneyStackPool => PoolContainer.instance.GetPool<MoneyStackPool>();
 
     Stack<MoneyStack> moneyStacks = new Stack<MoneyStack>();
+    Stack<int> moneyAmountStack = new Stack<int>();
 
     const float stackGap = 0.27f;
 
     int stackCount;
-    int moneyAmount;
 
     public void SpawnMoneyStack()
     {
@@ -34,12 +34,7 @@ public class MoneyPillar : InteractionObject
 
     public void IncreaseMoney(int amount)
     {
-        moneyAmount += amount;
-    }
-
-    public void DecreaseMoney(int amount)
-    {
-        moneyAmount -= amount;
+        moneyAmountStack.Push(amount);
     }
 
     public override Vector3 GetPos(int index)
@@ -71,8 +66,10 @@ public class MoneyPillar : InteractionObject
                 return;
 
             var moneyStack = moneyStacks.Pop();
+            var moneyAmount = moneyAmountStack.Pop();
             stackCount--;
             moneyStack.PlayMoneyToPlayerAnim(player.position);
+            player.IncreaseMoney(moneyAmount);
             cooldown = 0f;
         }
     }

@@ -1803,7 +1803,7 @@ MonoBehaviour:
   uiCamera: {fileID: 544299427}
   joystick: {fileID: 1891344713}
   player: {fileID: 296947590}
-  coinShower: {fileID: 0}
+  coinShower: {fileID: 1739020718}
 --- !u!1 &624026996
 GameObject:
   m_ObjectHideFlags: 0
@@ -5264,6 +5264,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1739020717}
+  - component: {fileID: 1739020718}
   m_Layer: 5
   m_Name: CoinShower
   m_TagString: Untagged
@@ -5294,6 +5295,20 @@ RectTransform:
   m_AnchoredPosition: {x: -20, y: -20}
   m_SizeDelta: {x: 150, y: 60}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &1739020718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739020716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c12140cdcf413194aaa1519afdabc4fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rtCoin: {fileID: 883010991}
+  txtCoin: {fileID: 883010992}
 --- !u!1001 &1765087474
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ public class CoinShower : MonoBehaviour
     {
         rtCoin.DOKill();
         rtCoin.localScale = Vector3.one * 1.25f;
-        rtCoin.DOScale(1f, 0.1f).SetEase(Ease.OutQuad);
+        rtCoin.DOScale(1f, 0.5f).SetEase(Ease.OutQuad);
         return this;
     }
 }
