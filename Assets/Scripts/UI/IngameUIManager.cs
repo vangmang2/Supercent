@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class IngameUIManager : MonoBehaviour
@@ -7,6 +8,19 @@ public class IngameUIManager : MonoBehaviour
     [SerializeField] RectTransform rtCanvas;
     [SerializeField] Camera uiCamera;
     [SerializeField] UIItemJoystick joystick;
+    [SerializeField] Player player;
+    [SerializeField] CoinShower coinShower;
+
+    private void Start()
+    {
+        player.SetActionOnCoinChanged(OnCoinChanged);
+    }
+
+    void OnCoinChanged(int coin)
+    {
+        coinShower.SetTextCoin(coin.ToString())
+                  .PlayCoinAnim();
+    }
 
     private void Update()
     {

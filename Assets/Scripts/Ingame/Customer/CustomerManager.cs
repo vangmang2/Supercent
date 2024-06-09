@@ -26,7 +26,8 @@ public class CustomerManager : MonoBehaviour
                                     // TODO: 총 인원이 아니지만 마땅한 이름이 생각나지 않아서 일단 maxCustomerCount로 명명. 나중에 좋은 이름 생각나면 바꾸자
 
     [SerializeField] InteractionObjectManager ioManager;
-    CustomerPool pool => PoolContainer.instance.GetPool<CustomerPool>();
+    CustomerPool customerPool => PoolContainer.instance.GetPool<CustomerPool>();
+    CroassantPool croassantPool => PoolContainer.instance.GetPool<CroassantPool>();
     int currCustomerCount;
     int rotationCount;
     CancellationTokenSource cts;
@@ -42,7 +43,7 @@ public class CustomerManager : MonoBehaviour
         await UniTask.WaitUntil(() => currCustomerCount < maxCustomerCount);
         await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
 
-        var customer = pool.Spawn(new Vector3(0f, 0.916666746f, 15.666667f), Quaternion.Euler(0f, 180f, 0f), null);
+        var customer = customerPool.Spawn(new Vector3(0f, 0.916666746f, 15.666667f), Quaternion.Euler(0f, 180f, 0f), null);
         customer.MoveToTarget(ioManager.GetPos(InteractionObjectType.basket, rotationCount))
                 .SetActionOnMoveEnd(OnMoveToCroassantEnd);
         currCustomerCount++;
@@ -121,7 +122,7 @@ public class CustomerManager : MonoBehaviour
         {
             var croassant = customer.PopCarriableObject();
             croassant.SetParent(bag.transform)
-                     .MoveToTargetWithCurve(bag.localPosition, 0.2f, height: 3f, onComplete: (croassant) => croassant.SetActive(false));
+                     .MoveToTargetWithCurve(bag.localPosition, 0.2f, height: 3f, onComplete: (croassant) => croassantPool.Despawn(croassant as Croassant));
             await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
         }
 
@@ -136,7 +137,7 @@ public class CustomerManager : MonoBehaviour
         customer.PushCarriableObject(bag);
 
         await UniTask.Delay(TimeSpan.FromSeconds(0.4f));
-        // TODO: 행복 이모티콘 띄우기
+
         bag.SetParent(customer.transform);
         bag.MoveToTargetWithCurve(new Vector3(0f, 0.819999993f, 0.730000019f), 0.2f, targetRot: 0f, onComplete: (carriableObject) =>
         {
@@ -144,9 +145,11 @@ public class CustomerManager : MonoBehaviour
                     .MoveToTarget(new Vector3(-0.360000014f, 0.50999999f, 14.1199999f))
                     .SetActionOnMoveEnd(DespawnCustomer);
 
+            pos.IncreaseMoney(5);
+
             void DespawnCustomer(Customer customer)
             {
-                pool.Despawn(customer);
+                customerPool.Despawn(customer);
             }
         });
     }

@@ -7,6 +7,7 @@ using Lean.Pool;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 
+// °¡°Ý 5¿ø
 public class Croassant : CarriableObject, IPoolable
 {
     [SerializeField] new Collider collider;

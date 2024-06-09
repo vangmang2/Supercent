@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,25 @@ public class Player : Interactant
     [SerializeField] Rigidbody rigidBody;
     [SerializeField] float speed;
     [SerializeField] Animator animator;
+    public int coin { get; private set; }
+    public Action<int> onCoinChanged;
+
+    public void SetActionOnCoinChanged(Action<int> callback)
+    {
+        onCoinChanged = callback;
+    }
+
+    public void IncreaseCoin(int amount)
+    {
+        coin += amount;
+        onCoinChanged?.Invoke(coin);
+    }
+
+    public void DecreaseCoin(int amount)
+    {
+        coin -= amount;
+        onCoinChanged?.Invoke(coin);
+    }
 
     public override InteractantType interactantType => InteractantType.giver;
 

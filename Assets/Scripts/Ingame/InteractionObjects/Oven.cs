@@ -12,7 +12,7 @@ public class Oven : InteractionObject
     [SerializeField] int maxCroassant;
     public int currCroassantCount { get; private set; }
     CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>();
-    Vector3 spawnPos => new Vector3(-5.94999981f, 1.74300003f, -2.3900001f);
+    Vector3 spawnPos => new Vector3(-5.98999977f, 1.89999998f, -3.81999993f);
 
 
     CancellationTokenSource cts;
@@ -40,7 +40,7 @@ public class Oven : InteractionObject
     void OnSpawnCroassant(Croassant croassant)
     {
         InvokePushCroassant(croassant).Forget();
-        croassant.MoveToTarget(new Vector3(-5.94999981f, 1.74300003f, -3.60100007f), 1f, (_croassant) =>
+        croassant.MoveToTarget(new Vector3(-5.98999977f, 1.89999998f, -4.96999979f), 1f, (_croassant) =>
         {
             var croassant = _croassant as Croassant;
             croassant.SetActiveCollider(true);

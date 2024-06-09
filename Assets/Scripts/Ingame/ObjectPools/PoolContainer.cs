@@ -4,13 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//public enum ObjectPoolType
-//{
-//    croassant,
-//    customer,
-//    paperBag
-//}
-
 public class PoolContainer : MonoBehaviour
 {
     public static PoolContainer instance { get; private set; }
