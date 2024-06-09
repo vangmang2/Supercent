@@ -27,6 +27,7 @@ public class MoneyPillar : InteractionObject
     {
         if (moneyStacks.Count <= 0)
             return;
+
         var moneyStack = moneyStacks.Pop();
         moneyStackPool.Despawn(moneyStack);
     }
@@ -49,10 +50,30 @@ public class MoneyPillar : InteractionObject
     Player player;
     public override void OnInteractantEnter(Interactant interactant)
     {
-
+        player = interactant as Player;
     }
 
     public override void OnInteractantExit(Interactant interactant)
     {
+        player = null;
+    }
+
+    float cooldown;
+    private void Update()
+    {
+        cooldown += Time.deltaTime;
+        if (cooldown >= 0.15f)
+        {
+            if (player == null)
+                return;
+
+            if (moneyStacks.Count <= 0)
+                return;
+
+            var moneyStack = moneyStacks.Pop();
+            stackCount--;
+            moneyStack.PlayMoneyToPlayerAnim(player.position);
+            cooldown = 0f;
+        }
     }
 }

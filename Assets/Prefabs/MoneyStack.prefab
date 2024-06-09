@@ -48,6 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8daaa7ecd31e8b049b11cdf2fa7e1d52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tfMoneyList:
+  - {fileID: 1245706069199181648}
+  - {fileID: 1245706068705849642}
+  - {fileID: 1245706068858604806}
+  - {fileID: 1245706067831058512}
 --- !u!1001 &1454294880638208812
 PrefabInstance:
   m_ObjectHideFlags: 0

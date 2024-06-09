@@ -18,6 +18,7 @@ public abstract class Interactant : MonoBehaviour
 
     protected Stack<CarriableObject> coStack = new Stack<CarriableObject>();
     public int currCOCount => coStack.Count;
+    public Vector3 position => transform.position;
     public Vector3 stackStartPos => new Vector3(0f, 0.643999994f, 0.470999986f);
     public float stackGap => 0.277f;
     public Transform parent => transform;
