@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class Pos : InteractionObject
+public class Pos : InteractionObject, ITutorialTarget
 {
     [SerializeField] MoneyPillar moneyPillar;
+    [SerializeField] GameObject tutorialPoint;
+
+    public int tutorialIndex => 2;
     public int currPaymentWaitingCount { get; private set; }
     public int currTableWaitingCount => tableWaitingCustomerQueue.Count;
 
@@ -15,6 +18,11 @@ public class Pos : InteractionObject
     public float lineGap => 1.25f;
 
     PaperBagPool paperBagPool => PoolContainer.instance.GetPool<PaperBagPool>();
+
+    public Transform tutorialTarget => transform;
+
+    public GameObject goTargetPoint => tutorialPoint;
+
     List<Interactant> casherList = new List<Interactant>();
     Queue<Customer> customerQueue = new Queue<Customer>();
     Queue<Customer> tableWaitingCustomerQueue = new Queue<Customer>();
@@ -113,6 +121,7 @@ public class Pos : InteractionObject
     }
 
     float cooldown;
+    int tutorialCustomerCount;
     private void Update()
     {
         cooldown += Time.deltaTime;
@@ -126,6 +135,16 @@ public class Pos : InteractionObject
                 var customer = customerQueue.Peek();
                 var bag = paperBagPool.Spawn(new Vector3(-1.44000006f, 1.36699998f, 0f), Quaternion.Euler(0f, 90f, 0f), null);
                 onPay?.Invoke(this, customer, bag);
+
+                if (TutorialManager.instance.tutorialIndex == 3)
+                {
+                    tutorialCustomerCount++;
+                    if (tutorialCustomerCount == 2)
+                    {
+                        // 4. 테이블쪽으로 카메라 이동, 포스기 옆 돈 강조
+                        TutorialManager.instance.PlayTutorial();
+                    }
+                }
             }
             cooldown = 0f;
         }

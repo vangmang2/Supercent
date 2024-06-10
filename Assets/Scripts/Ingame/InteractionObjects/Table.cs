@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Table : InteractionObject
+public class Table : InteractionObject, ITutorialTarget
 {
     [SerializeField] TMP_Text txtAmount;
     [SerializeField] ParticleSystem vfx_Clean;
     [SerializeField] List<GameObject> goLockList, goUnlockList;
-    [SerializeField] GameObject goTrash;
+    [SerializeField] GameObject goTrash, goTutorialPoint;
     [SerializeField] MoneyPillar moneyPillar;
     int currUnlockAmount = 5;
 
@@ -28,6 +28,10 @@ public class Table : InteractionObject
             return waitingQueue.Count > 0 ? waitingQueue.Peek() : null;
         }
     }
+
+    public int tutorialIndex => 4;
+    public Transform tutorialTarget => transform;
+    public GameObject goTargetPoint => goTutorialPoint;
 
     public void SetActiveTrash(bool enable)
     {
@@ -115,6 +119,11 @@ public class Table : InteractionObject
     [Button]
     void ShowUnlockedObject()
     {
+        if (TutorialManager.instance.tutorialIndex == 5)
+        {
+            TutorialManager.instance.PlayTutorial();
+        }
+
         foreach (var go in goLockList)
         {
             go.SetActive(false);

@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoneyPillar : InteractionObject
+public class MoneyPillar : InteractionObject, ITutorialTarget
 {
+    [SerializeField] GameObject tutorialPoint;
     public MoneyStackPool moneyStackPool => PoolContainer.instance.GetPool<MoneyStackPool>();
 
     Stack<MoneyStack> moneyStacks = new Stack<MoneyStack>();
@@ -12,6 +13,10 @@ public class MoneyPillar : InteractionObject
 
     const float stackGap = 0.27f;
     public bool isPlayerOn { get; private set; }
+
+    public int tutorialIndex => 3;
+    public Transform tutorialTarget => transform;
+    public GameObject goTargetPoint => tutorialPoint;
 
     public void SpawnMoneyStack()
     {
@@ -37,9 +42,18 @@ public class MoneyPillar : InteractionObject
     }
 
     Player player;
+    bool hasTutorialEnter;
     public override void OnInteractantEnter(Interactant interactant)
     {
         player = interactant as Player;
+        if (!hasTutorialEnter)
+        {
+            if (TutorialManager.instance.tutorialIndex == 4)
+            {
+                TutorialManager.instance.PlayTutorial();
+                hasTutorialEnter = true;
+            }
+        }
     }
 
     public override void OnInteractantExit(Interactant interactant)

@@ -5,13 +5,19 @@ using System.Threading;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Oven : InteractionObject
+public class Oven : InteractionObject, ITutorialTarget
 {
 
     [SerializeField] int maxCroassant;
+    [SerializeField] GameObject tutorialPoint;
+
     public int currCroassantCount { get; private set; }
     CroassantPool pool => PoolContainer.instance.GetPool<CroassantPool>();
     Vector3 spawnPos => new Vector3(-5.98999977f, 1.89999998f, -3.81999993f);
+
+    public int tutorialIndex => 0;
+    public Transform tutorialTarget => transform;
+    public GameObject goTargetPoint => tutorialPoint;
 
 
     CancellationTokenSource cts;
@@ -28,7 +34,7 @@ public class Oven : InteractionObject
     async UniTaskVoid Produce()
     {
         await UniTask.WaitUntil(() => currCroassantCount < maxCroassant, cancellationToken: cts.Token);
-        await UniTask.Delay(TimeSpan.FromSeconds(1.5f), cancellationToken: cts.Token);
+        await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: cts.Token);
 
         pool.Spawn(spawnPos, Quaternion.identity, OnSpawnCroassant);
         currCroassantCount++;
@@ -56,8 +62,6 @@ public class Oven : InteractionObject
 
     public override void OnInteractantEnter(Interactant interactant)
     {
-        if (interactant.interactantType != InteractantType.giver)
-            return;
         interactants.Add(interactant);
     }
 
@@ -71,6 +75,7 @@ public class Oven : InteractionObject
         return Vector3.zero;
     }
 
+    int tutorialCroassantCount;
     float cooldown;
     private void Update()
     {
@@ -95,6 +100,14 @@ public class Oven : InteractionObject
                 croassant.SetActiveCollider(false)
                          .DestroyRigidbody()
                          .MoveToTargetWithCurve(targetPos, 0.2f);
+
+                // 2. 바스켓 강조
+                if (TutorialManager.instance.tutorialIndex == 1)
+                {
+                    tutorialCroassantCount++;
+                    if (tutorialCroassantCount == 6)
+                        TutorialManager.instance.PlayTutorial();
+                }
             }
 
             cooldown = 0f;

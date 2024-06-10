@@ -2,12 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Basket : InteractionObject
+public class Basket : InteractionObject, ITutorialTarget
 {
     const int maxStackCount = 8;
+
+    [SerializeField] GameObject tutorialPoint;
+    
     public int currCroassantCount { get; private set; }
     public Vector3 stackStartPos => new Vector3(-0.37505f, 0.263999999f, 0.588999987f);
     public Vector3 stackGap => new Vector3(0.75f, 0f, -0.354f);
+
+    public int tutorialIndex => 1;
+    public Transform tutorialTarget => transform;
+    public GameObject goTargetPoint => tutorialPoint;
 
     Stack<Croassant> croassants = new Stack<Croassant>();
     List<Interactant> interactants = new List<Interactant>();
@@ -44,6 +51,8 @@ public class Basket : InteractionObject
     }
 
     float cooldown;
+    int tutorialCroassantCount;
+
     private void Update()
     {
         cooldown += Time.deltaTime;
@@ -69,6 +78,16 @@ public class Basket : InteractionObject
 
                     croassant.SetParent(transform)
                              .MoveToTargetWithCurve(targetPos, 0.2f);
+
+                    // 3. 포스기 강조
+                    if (TutorialManager.instance.tutorialIndex == 2)
+                    {
+                        tutorialCroassantCount++;
+                        if (tutorialCroassantCount == 6)
+                        {
+                            TutorialManager.instance.PlayTutorial();
+                        }
+                    }
                 }
                 else
                 {
