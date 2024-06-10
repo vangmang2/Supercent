@@ -8,24 +8,24 @@ public class Player : Interactant
     [SerializeField] Rigidbody rigidBody;
     [SerializeField] float speed;
     [SerializeField] Animator animator;
-    public int coin { get; private set; }
-    public Action<int> onCoinChanged;
+    public int money { get; private set; }
+    public Action<int> onMoneyChanged;
 
-    public void SetActionOnCoinChanged(Action<int> callback)
+    public void SetActionOnMoneyChanged(Action<int> callback)
     {
-        onCoinChanged = callback;
+        onMoneyChanged = callback;
     }
 
     public void IncreaseMoney(int amount)
     {
-        coin += amount;
-        onCoinChanged?.Invoke(coin);
+        money += amount;
+        onMoneyChanged?.Invoke(money);
     }
 
-    public void DecreaseCoin(int amount)
+    public void DecreaseMoney(int amount)
     {
-        coin -= amount;
-        onCoinChanged?.Invoke(coin);
+        money -= amount;
+        onMoneyChanged?.Invoke(money);
     }
 
     public override InteractantType interactantType => InteractantType.giver;

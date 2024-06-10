@@ -173,8 +173,10 @@ public class Customer : Interactant, IPoolable
 
     async UniTaskVoid InvokeMoveToTarget()
     {
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
         // 에이전트 업데이트가 바로바로 되지 않는 듯 하다. RemainingDistance에 완전히 의존 불가능.
-        await UniTask.WaitUntil(() => agent.remainingDistance <= 0.05f && (transform.position - agent.destination).magnitude <= 0.05f);
+        await UniTask.WaitUntil(() => agent.remainingDistance <= 0.05f && (transform.position - agent.destination).magnitude <= 0.05f, cancellationToken: cts.Token);
         onMoveEnd?.Invoke(this);
     }
 
@@ -187,5 +189,10 @@ public class Customer : Interactant, IPoolable
     {
         agent.SetDestination(target);
         return this;
+    }
+
+    void OnDestroy()
+    {
+        cts?.Cancel();
     }
 }

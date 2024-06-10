@@ -13,7 +13,7 @@ public class IngameUIManager : MonoBehaviour
 
     private void Start()
     {
-        player.SetActionOnCoinChanged(OnCoinChanged);
+        player.SetActionOnMoneyChanged(OnCoinChanged);
     }
 
     void OnCoinChanged(int coin)
