@@ -30,6 +30,9 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFX(SoundType type)
     {
+        if (type == SoundType.none)
+            return;
+
         if (currAudioIndex >= audioArr.Length)
             currAudioIndex = 0;
 

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MoneyPillar : InteractionObject
 {
-    public override InteractionObjectType interactionObjectType => throw new System.NotImplementedException();
     public MoneyStackPool moneyStackPool => PoolContainer.instance.GetPool<MoneyStackPool>();
 
     Stack<MoneyStack> moneyStacks = new Stack<MoneyStack>();

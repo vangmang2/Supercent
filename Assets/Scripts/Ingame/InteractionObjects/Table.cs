@@ -10,12 +10,35 @@ public class Table : InteractionObject
     [SerializeField] List<GameObject> goLockList, goUnlockList;
     int currUnlockAmount = 5;
 
-    public bool canUse { get; private set; }
-    public override InteractionObjectType interactionObjectType => InteractionObjectType.table;
+    Queue<Customer> waitingQueue = new Queue<Customer>();
+
+    public bool isUnlocked { get; private set; }
+    public bool isClean { get; private set; }
+    public int currQueueCount => waitingQueue.Count;
+
+    public Customer nextCustomer
+    {
+        get
+        {
+            return waitingQueue.Count > 0 ? waitingQueue.Peek() : null;
+        }
+    }
+
 
     private void Start()
     {
+        isClean = true;
         txtAmount.SetText(currUnlockAmount.ToString());
+    }
+
+    public void EnqueueCustomer(Customer customer)
+    {
+        waitingQueue.Enqueue(customer);
+    }
+
+    public void Dequeue()
+    {
+        waitingQueue.Dequeue();
     }
 
     public override Vector3 GetPos(int index)
@@ -82,7 +105,7 @@ public class Table : InteractionObject
 
             if (currUnlockAmount <= 0)
             {
-                canUse = true;
+                isUnlocked = true;
                 // 테이블 언락
                 ShowUnlockedObject();
             }

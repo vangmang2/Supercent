@@ -5,7 +5,8 @@ using UnityEngine;
 public enum SoundType
 {
     getObject,
-    putObject
+    putObject,
+    none
 }
 
 public class SoundSource : MonoBehaviour

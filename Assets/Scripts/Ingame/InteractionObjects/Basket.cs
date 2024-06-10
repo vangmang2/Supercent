@@ -4,7 +4,6 @@ using UnityEngine;
 public class Basket : InteractionObject
 {
     const int maxStackCount = 8;
-    public override InteractionObjectType interactionObjectType => InteractionObjectType.basket;
     public int currCroassantCount { get; private set; }
     public Vector3 stackStartPos => new Vector3(-0.37505f, 0.263999999f, 0.588999987f);
     public Vector3 stackGap => new Vector3(0.75f, 0f, -0.354f);

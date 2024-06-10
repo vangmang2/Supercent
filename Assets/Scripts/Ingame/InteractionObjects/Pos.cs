@@ -6,8 +6,6 @@ using UnityEngine;
 public class Pos : InteractionObject
 {
     [SerializeField] MoneyPillar moneyPillar;
-
-    public override InteractionObjectType interactionObjectType => InteractionObjectType.pos;
     public int currPaymentWaitingCount { get; private set; }
     public int currTableWaitingCount { get; private set; }
 
@@ -45,10 +43,19 @@ public class Pos : InteractionObject
         return this;
     }
 
-    public void IncreaseMoney(int amount)
+    public void IncreaseMoney(int amount, int loopCount = 1, float delay = 0.1f)
     {
-        moneyPillar.IncreaseMoney(amount);
-        moneyPillar.SpawnMoneyStack();
+        InvokeIncreaseMoney(amount, loopCount, delay).Forget();
+    }
+
+    async UniTaskVoid InvokeIncreaseMoney(int amount, int loopCount, float delay)
+    {
+        for (int i = 0; i < loopCount; i++)
+        {
+            moneyPillar.IncreaseMoney(amount);
+            moneyPillar.SpawnMoneyStack();
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+        }
     }
 
     public override void OnInteractantEnter(Interactant interactant)

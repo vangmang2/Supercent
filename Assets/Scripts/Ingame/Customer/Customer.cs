@@ -8,6 +8,7 @@ using DG.Tweening;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using Sirenix.Utilities;
 
 public enum Needs
 {
@@ -51,7 +52,7 @@ public class Customer : Interactant, IPoolable
     Action<Customer> onWaitForAction;
     public CustomerStep customerStep { get; private set; } // 스텝에 따라 손님의 행동이 달라진다
     public override InteractantType interactantType => InteractantType.getter;
-
+    bool isSitting;
     CancellationTokenSource cts;
 
     void Start()
@@ -66,6 +67,12 @@ public class Customer : Interactant, IPoolable
         customer.ShowNeeds(true);
     }
 
+    public Customer SetEnableIsSitting(bool enable)
+    {
+        isSitting = enable;
+        return this;
+    }
+
     public Customer SetActionOnMoveEnd(Action<Customer> callback)
     {
         onMoveEnd = callback;
@@ -78,16 +85,47 @@ public class Customer : Interactant, IPoolable
         return this;
     }
 
-    void SetAgentAvoidQuality(ObstacleAvoidanceType type)
+    public Customer SetAgentAvoidQuality(ObstacleAvoidanceType type)
     {
         agent.obstacleAvoidanceType = type;
+        return this;
     }
 
-    public void WaitForAction_Until(Func<Customer, bool> predicate)
+    public Customer SetActiveAgent(bool enable)
+    {
+        agent.enabled = enable;
+        return this;
+    }
+
+    public Customer SetPosition(Vector3 position)
+    {
+        transform.position = position;
+        return this;
+    }
+
+    public Customer SetRotation(Quaternion rotation)
+    {
+        transform.rotation = rotation;
+        return this;
+    }
+
+    public void PlayAction(Action<Customer> callback, float delay)
+    {
+        InvokePlayAction(callback, delay).Forget();
+    }
+
+    async UniTaskVoid InvokePlayAction(Action<Customer> callback, float delay)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(delay));
+        callback?.Invoke(this);
+    }
+
+    public Customer WaitForAction_Until(Func<Customer, bool> predicate)
     {
         cts?.Cancel();
         cts = new CancellationTokenSource();
         InvokeWaitForAction_Until(predicate).Forget();
+        return this;
     }
 
     async UniTaskVoid InvokeWaitForAction_Until(Func<Customer, bool> predicate)
@@ -98,6 +136,7 @@ public class Customer : Interactant, IPoolable
 
     public void OnSpawn()
     {
+        isSitting = false;
         customerNeeds = CustomerStatesManager.instance.Spawn(transform);
         customerNeeds.SetActive(false);
         SetAgentAvoidQuality(ObstacleAvoidanceType.HighQualityObstacleAvoidance);
@@ -105,21 +144,32 @@ public class Customer : Interactant, IPoolable
 
     public void OnDespawn()
     {
-        SetAgentAvoidQuality(ObstacleAvoidanceType.NoObstacleAvoidance);
         CustomerStatesManager.instance.Despawn(customerNeeds);
         onMoveEnd = null;
         onWaitForAction = null;
 
         // 종이 가방도 디스폰해줘야 함
+        if (currentNeeds.isGoingToTable)
+            return;
         var bag = coStack.Pop() as PaperBag;
         PoolContainer.instance.GetPool<PaperBagPool>().Despawn(bag);
     }
 
+    public void ForEachCOStacks(Action<CarriableObject, int> callback)
+    {
+        int index = 0;
+        foreach (var co in coStack)
+        {
+            callback?.Invoke(co, index);
+            index++;
+        }
+    }
 
     private void Update()
     {
         animator.SetBool("Move", agent.velocity.magnitude > 0.1f);
         animator.SetBool("IsHoldingSomething", coStack.Count > 0);
+        animator.SetBool("IsSitting", isSitting);
     }
 
     public Customer SetNeedsToCroassant()
@@ -146,6 +196,12 @@ public class Customer : Interactant, IPoolable
         return this;
     }
 
+    public Customer SetNeedsToTable()
+    {
+        currentNeeds.needs = Needs.table;
+        return this;
+    }
+
     public Customer ShowNeeds(bool showValue)
     {
         customerNeeds.SetActiveNeeds(true)
@@ -161,6 +217,12 @@ public class Customer : Interactant, IPoolable
     {
         customerNeeds.SetActiveHappyFace(true)
                      .SetActiveNeeds(false);
+        return this;
+    }
+
+    public Customer SetActiveNeeds(bool enable)
+    {
+        customerNeeds.SetActive(enable);
         return this;
     }
 

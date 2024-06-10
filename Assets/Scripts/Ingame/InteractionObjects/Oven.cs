@@ -7,7 +7,6 @@ using Random = UnityEngine.Random;
 
 public class Oven : InteractionObject
 {
-    public override InteractionObjectType interactionObjectType => InteractionObjectType.oven;
 
     [SerializeField] int maxCroassant;
     public int currCroassantCount { get; private set; }

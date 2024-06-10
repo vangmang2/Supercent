@@ -8,6 +8,18 @@ using UnityEngine;
 public class CarriableObject : MonoBehaviour
 {
 
+    public CarriableObject SetPosition(Vector3 position)
+    {
+        transform.position = position;
+        return this;
+    }
+
+    public CarriableObject SetRotation(Quaternion rotation)
+    {
+        transform.rotation = rotation;
+        return this;
+    }
+
     public CarriableObject SetParent(Transform parent)
     {
         transform.SetParent(parent);

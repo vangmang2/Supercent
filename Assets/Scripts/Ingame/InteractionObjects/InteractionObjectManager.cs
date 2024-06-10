@@ -1,40 +1,33 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 public class InteractionObjectManager : MonoBehaviour
-{
-    //public static InteractionObjectManager instance { get; private set; }
-
+{    
     [SerializeField] List<InteractionObject> ioList;
-    Dictionary<InteractionObjectType, InteractionObject> ioDic = new Dictionary<InteractionObjectType, InteractionObject>();
-
-    private void Awake()
-    {
-        //instance = this;
-    }
+    Dictionary<Type, InteractionObject> ioDic = new Dictionary<Type, InteractionObject>();
 
     private void Start()
     {
         foreach (var io in ioList)
         {
-            ioDic.Add(io.interactionObjectType, io);
+            ioDic.Add(io.GetType(), io);
         }
     }
 
-    public Vector3 GetPos(InteractionObjectType type)
+    public Vector3 GetPos<T>() where T : InteractionObject
     {
-        return ioDic[type].position;
+        return ioDic[typeof(T)].position;
     }
 
-    public Vector3 GetPos(InteractionObjectType type, int index)
+    public Vector3 GetPos<T>(int index) where T : InteractionObject
     {
-        return ioDic[type].GetPos(index);
+        return ioDic[typeof(T)].GetPos(index);
     }
 
-    public T GetInteractionObject<T>(InteractionObjectType type) where T : InteractionObject
+    public T GetInteractionObject<T>() where T : InteractionObject
     {
-        return ioDic[type] as T;
+        return ioDic[typeof(T)] as T;
     }
 }
