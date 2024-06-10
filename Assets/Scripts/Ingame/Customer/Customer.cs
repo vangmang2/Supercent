@@ -25,15 +25,6 @@ public struct CurrentNeeds
     public bool isGoingToTable;
 }
 
-public enum CustomerStep
-{
-    waitForAction,
-    moveToBasket,
-    moveToPos,
-    moveToTable,
-    moveToEntrance,
-}
-
 public class Customer : Interactant, IPoolable
 {
     static int TableingCount = 0;
@@ -43,22 +34,15 @@ public class Customer : Interactant, IPoolable
 
     public CurrentNeeds currentNeeds;
 
-    public Vector3 position => transform.position;
     public Vector3 destination => agent.destination;
     public Vector3 up => transform.up;
 
     HUDCustomerStates customerNeeds;
     Action<Customer> onMoveEnd;
     Action<Customer> onWaitForAction;
-    public CustomerStep customerStep { get; private set; } // 스텝에 따라 손님의 행동이 달라진다
     public override InteractantType interactantType => InteractantType.getter;
     bool isSitting;
     CancellationTokenSource cts;
-
-    void Start()
-    {
-        SetActionOnPushCarriableObject(OnPushCroassant);
-    }
 
     void OnPushCroassant(Interactant interactant)
     {
@@ -122,14 +106,14 @@ public class Customer : Interactant, IPoolable
 
     public Customer WaitForAction_Until(Func<Customer, bool> predicate)
     {
-        cts?.Cancel();
-        cts = new CancellationTokenSource();
         InvokeWaitForAction_Until(predicate).Forget();
         return this;
     }
 
     async UniTaskVoid InvokeWaitForAction_Until(Func<Customer, bool> predicate)
     {
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
         await UniTask.WaitUntil(() => (bool)predicate?.Invoke(this), cancellationToken: cts.Token);
         onWaitForAction?.Invoke(this);
     }
@@ -137,16 +121,19 @@ public class Customer : Interactant, IPoolable
     public void OnSpawn()
     {
         isSitting = false;
+        onMoveEnd = null;
+        onWaitForAction = null;
+
         customerNeeds = CustomerStatesManager.instance.Spawn(transform);
         customerNeeds.SetActive(false);
+
+        SetActionOnPushCarriableObject(OnPushCroassant);
         SetAgentAvoidQuality(ObstacleAvoidanceType.HighQualityObstacleAvoidance);
     }
 
     public void OnDespawn()
     {
         CustomerStatesManager.instance.Despawn(customerNeeds);
-        onMoveEnd = null;
-        onWaitForAction = null;
 
         // 종이 가방도 디스폰해줘야 함
         if (currentNeeds.isGoingToTable)
@@ -175,7 +162,7 @@ public class Customer : Interactant, IPoolable
     public Customer SetNeedsToCroassant()
     {
         currentNeeds.needs = Needs.croassant;
-        currentNeeds.targetValue = Random.Range(2, 4);
+        currentNeeds.targetValue = Random.Range(1, 4);
         currentNeeds.currentValue = 0;
 
         currentNeeds.isGoingToTable = TableingCount == 2;
@@ -183,7 +170,7 @@ public class Customer : Interactant, IPoolable
         if (TableingCount >= 2)
         {
             TableingCount = 0;
-        }        
+        }
         TableingCount++;
 
         SetMaxStackCount(currentNeeds.targetValue);
@@ -235,11 +222,11 @@ public class Customer : Interactant, IPoolable
 
     async UniTaskVoid InvokeMoveToTarget()
     {
-        cts?.Cancel();
-        cts = new CancellationTokenSource();
-        // 에이전트 업데이트가 바로바로 되지 않는 듯 하다. RemainingDistance에 완전히 의존 불가능.
-        await UniTask.WaitUntil(() => agent.remainingDistance <= 0.05f && (transform.position - agent.destination).magnitude <= 0.05f, cancellationToken: cts.Token);
+        await UniTask.DelayFrame(1);
+
+        await UniTask.WaitUntil(() => (transform.position - agent.destination).magnitude <= 0.1f);
         onMoveEnd?.Invoke(this);
+
     }
 
     public void RotateTo(Quaternion rot, float duration)

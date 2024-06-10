@@ -7,7 +7,7 @@ public class Pos : InteractionObject
 {
     [SerializeField] MoneyPillar moneyPillar;
     public int currPaymentWaitingCount { get; private set; }
-    public int currTableWaitingCount { get; private set; }
+    public int currTableWaitingCount => tableWaitingCustomerQueue.Count;
 
     public Vector3 paymentWatingStartPos => new Vector3(-0.800000012f, 0f, 1.38999999f);
     public Vector3 tableWatingStartPos => new Vector3(0.949999988f, 0f, 1.38999999f);
@@ -16,6 +16,7 @@ public class Pos : InteractionObject
     PaperBagPool paperBagPool => PoolContainer.instance.GetPool<PaperBagPool>();
     List<Interactant> casherList = new List<Interactant>();
     Queue<Customer> customerQueue = new Queue<Customer>();
+    Queue<Customer> tableWaitingCustomerQueue = new Queue<Customer>();
 
     Action<Pos, Customer, PaperBag> onPay;
 
@@ -31,16 +32,26 @@ public class Pos : InteractionObject
         return this;
     }
 
-    public Pos IncreaseTableWatingCount()
+    public Pos EnqueueTableWaitingCustomer(Customer customer)
     {
-        currTableWaitingCount++;
+        tableWaitingCustomerQueue.Enqueue(customer);
         return this;
     }
 
-    public Pos DecreaseTableWatingCount()
+    public Pos DequeueTableWaitingCustomer()
     {
-        currTableWaitingCount--;
+        tableWaitingCustomerQueue.Dequeue();
         return this;
+    }
+
+    public void UpdateTableWaitingCustomerLine()
+    {
+        var index = 0;
+        foreach (var customer in tableWaitingCustomerQueue)
+        {
+            customer.MoveToTarget(tableWatingStartPos + new Vector3(0f, 0f, lineGap * index));
+            index++;
+        }
     }
 
     public void IncreaseMoney(int amount, int loopCount = 1, float delay = 0.1f)

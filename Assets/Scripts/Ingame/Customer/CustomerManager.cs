@@ -25,7 +25,7 @@ using UnityEngine.Video;
 public class CustomerManager : MonoBehaviour
 {
     const int maxCroassantWaitingCount = 3; // 크로아상 바구니에 대기할 수 있는 인원.
-    const int maxCustomerCount = 8;         // 매장에 존재할 수 있는 손님 수
+    const int maxCustomerCount = 6;         // 매장에 존재할 수 있는 손님 수
 
     [SerializeField] InteractionObjectManager ioManager;
     CustomerPool customerPool => PoolContainer.instance.GetPool<CustomerPool>();
@@ -84,6 +84,7 @@ public class CustomerManager : MonoBehaviour
     void OnCroassantReady(Customer customer)
     {
         customer.SetAgentAvoidQuality(ObstacleAvoidanceType.NoObstacleAvoidance);
+        currCroassantWaitingCount--;
 
         var basekt = ioManager.GetInteractionObject<Basket>();
         basekt.RemoveInteractant(customer);
@@ -103,19 +104,21 @@ public class CustomerManager : MonoBehaviour
             }
             else
             {
-                customer.SetNeedsToTable()
+                customer.SetNeedsToPos()
                         .ShowNeeds(false);
                 var pos = ioManager.GetInteractionObject<Pos>();
 
                 customer.MoveToTarget(pos.tableWatingStartPos + new Vector3(0f, 0f, pos.lineGap * pos.currTableWaitingCount))
-                        .SetActionOnMoveEnd(OnMoveToPosEnd);
+                        .SetActionOnMoveEnd((customer) =>
+                        {
+                            OnMoveToPosEnd(customer);
+                            customer.SetNeedsToTable()
+                                    .ShowNeeds(false);
+                        });
 
-                pos.IncreaseTableWatingCount();
-                currCroassantWaitingCount--;
-
-                // 테이블 이용할 수 있을 때 까지 기다렸다가 테이블 이용
+                pos.EnqueueTableWaitingCustomer(customer);
                 customer.WaitForAction_Until(IsTableReady)
-                        .SetActionOnWaitForAction(GoToTable);
+                        .SetActionOnWaitForAction(GoToTableWithUpdateLine);
             }
         }
         else
@@ -130,8 +133,6 @@ public class CustomerManager : MonoBehaviour
             pos.SetActionOnPay(OnPayToPos)
                .IncreasePaymentWaitingCount()
                .EnqueueCustomer(customer);
-
-            currCroassantWaitingCount--;
         }
     }
 
@@ -141,12 +142,21 @@ public class CustomerManager : MonoBehaviour
         return table.isUnlocked && table.isClean && table.nextCustomer.Equals(customer);
     }
 
+    void GoToTableWithUpdateLine(Customer customer)
+    {
+        GoToTable(customer);
+
+        var pos = ioManager.GetInteractionObject<Pos>();
+        pos.DequeueTableWaitingCustomer()
+           .UpdateTableWaitingCustomerLine();
+    }
+
     void GoToTable(Customer customer)
     {
-        customer.MoveToTarget(new Vector3(5.55000019f, 0.479999989f, 7.05000019f))
+        customer.SetNeedsToTable()
+                .ShowNeeds(false)
+                .MoveToTarget(new Vector3(5.55000019f, 0.479999989f, 7.05000019f))
                 .SetActionOnMoveEnd(StartMeal);
-
-        // 테이블 라인 대기하고 있는 손님들 다 땡겨줘야 함
     }
 
     void StartMeal(Customer customer)
@@ -183,7 +193,7 @@ public class CustomerManager : MonoBehaviour
                 .SetActiveAgent(true)
                 .SetEnableIsSitting(false)
                 .ShowHappyFace()
-                .MoveToTarget(new Vector3(-0.360000014f, 0.50999999f, 14.1199999f))
+                .MoveToTarget(new Vector3(0.310000002f, 0.50999999f, 9.71000004f))
                 .SetActionOnMoveEnd(DespawnCustomer);
 
         // 테이블에 쓰레기 효과 추가
@@ -229,7 +239,7 @@ public class CustomerManager : MonoBehaviour
         {
             currCustomerCount--;
             customer.ShowHappyFace()
-                    .MoveToTarget(new Vector3(-0.360000014f, 0.50999999f, 14.1199999f))
+                    .MoveToTarget(new Vector3(0.310000002f, 0.50999999f, 9.71000004f))
                     .SetActionOnMoveEnd(DespawnCustomer);
 
             pos.IncreaseMoney(5, croassantCount);

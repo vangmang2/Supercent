@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Basket : InteractionObject
@@ -48,7 +49,7 @@ public class Basket : InteractionObject
         cooldown += Time.deltaTime;
         if (cooldown >= 0.15f)
         {
-            foreach (var interactant in interactants)
+            foreach (var interactant in interactants.ToList())
             {
                 if (interactant.interactantType == InteractantType.giver)
                 {
