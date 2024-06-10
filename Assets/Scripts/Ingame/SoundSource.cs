@@ -6,6 +6,9 @@ public enum SoundType
 {
     getObject,
     putObject,
+    cash,
+    cleanTrash,
+    success,
     none
 }
 

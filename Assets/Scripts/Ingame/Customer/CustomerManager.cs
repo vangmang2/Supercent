@@ -199,6 +199,8 @@ public class CustomerManager : MonoBehaviour
 
         table.IncreaseMoney(5, croassantCount)
              .SetActiveTrash(true);
+
+        SoundManager.instance.PlaySFX(SoundType.cash);
     }
 
     void OnMoveToPosEnd(Customer customer)
@@ -246,6 +248,7 @@ public class CustomerManager : MonoBehaviour
                     .SetActionOnMoveEnd(DespawnCustomer);
 
             pos.IncreaseMoney(5, croassantCount);
+            SoundManager.instance.PlaySFX(SoundType.cash);
         });
     }
 

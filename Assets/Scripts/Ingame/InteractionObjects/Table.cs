@@ -13,7 +13,7 @@ public class Table : InteractionObject, ITutorialTarget
     [SerializeField] List<GameObject> goLockList, goUnlockList;
     [SerializeField] GameObject goTrash, goTutorialPoint;
     [SerializeField] MoneyPillar moneyPillar;
-    int currUnlockAmount = 5;
+    int currUnlockAmount = 30;
 
     Queue<Customer> waitingQueue = new Queue<Customer>();
 
@@ -95,6 +95,7 @@ public class Table : InteractionObject, ITutorialTarget
 
         SetActiveTrash(false);
         PlayCleanSfx();
+        SoundManager.instance.PlaySFX(SoundType.cleanTrash);
     }
 
     public override void OnInteractantExit(Interactant interactant)
@@ -158,6 +159,7 @@ public class Table : InteractionObject, ITutorialTarget
                 isUnlocked = true;
                 // 테이블 언락
                 ShowUnlockedObject();
+                SoundManager.instance.PlaySFX(SoundType.success);
 
                 LogicManager.instance.SetActiveEtcPrice(true);
                 FollowingCamera.instance.SetEnableCanFollow(false)
