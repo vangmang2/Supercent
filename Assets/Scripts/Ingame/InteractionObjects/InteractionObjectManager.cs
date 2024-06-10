@@ -8,6 +8,13 @@ public class InteractionObjectManager : MonoBehaviour
     [SerializeField] List<InteractionObject> ioList;
     Dictionary<Type, InteractionObject> ioDic = new Dictionary<Type, InteractionObject>();
 
+    public static InteractionObjectManager instance { get; private set; }
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private void Start()
     {
         foreach (var io in ioList)

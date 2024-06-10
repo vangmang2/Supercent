@@ -158,6 +158,13 @@ public class Table : InteractionObject, ITutorialTarget
                 isUnlocked = true;
                 // 테이블 언락
                 ShowUnlockedObject();
+
+                LogicManager.instance.SetActiveEtcPrice(true);
+                FollowingCamera.instance.SetEnableCanFollow(false)
+                               .MoveToTarget(new Vector3(-8.69999981f, 11.3550005f, -5.6500001f), 1f, (followingCamera) =>
+                               {
+                                   followingCamera.SetEnableCanFollow(true);
+                               });
             }
             cooldown = 0f;
         }

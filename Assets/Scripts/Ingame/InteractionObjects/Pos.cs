@@ -143,6 +143,11 @@ public class Pos : InteractionObject, ITutorialTarget
                     {
                         // 4. 테이블쪽으로 카메라 이동, 포스기 옆 돈 강조
                         TutorialManager.instance.PlayTutorial();
+                        FollowingCamera.instance.SetEnableCanFollow(false)
+                                                .MoveToTarget(new Vector3(6.53000021f, 11.3550005f, -1.73000002f), 0f, (followingCamera) =>
+                                                {
+                                                    followingCamera.SetEnableCanFollow(true);
+                                                });
                     }
                 }
             }
