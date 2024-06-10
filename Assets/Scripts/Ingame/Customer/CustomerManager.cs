@@ -44,7 +44,7 @@ public class CustomerManager : MonoBehaviour
     async UniTaskVoid InvokeCustomerSpawn()
     {
         await UniTask.WaitUntil(() => currCroassantWaitingCount < maxCroassantWaitingCount && currCustomerCount < maxCustomerCount);
-        await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
+        await UniTask.Delay(TimeSpan.FromSeconds(2f));
 
         var customer = customerPool.Spawn(new Vector3(0f, 0.916666746f, 15.666667f), Quaternion.Euler(0f, 180f, 0f), null);
         customer.MoveToTarget(ioManager.GetPos<Basket>(rotationCount))
@@ -207,22 +207,23 @@ public class CustomerManager : MonoBehaviour
 
     void OnPayToPos(Pos pos, Customer customer, PaperBag bag)
     {
+        customer.InstancePaymentCts();
         InvokePayment(pos, customer, bag).Forget();
     }
 
     async UniTaskVoid InvokePayment(Pos pos,Customer customer, PaperBag bag)
     {
         var croassantCount = customer.currCOCount;
-        await UniTask.Delay(TimeSpan.FromSeconds(0.15f));
+        await UniTask.Delay(TimeSpan.FromSeconds(0.15f), cancellationToken: customer.paymentCts.Token);
         while (customer.currCOCount > 0)
         {
             var croassant = customer.PopCarriableObject();
             croassant.SetParent(bag.transform)
                      .MoveToTargetWithCurve(bag.localPosition, 0.2f, height: 3f, onComplete: (croassant) => croassantPool.Despawn(croassant as Croassant));
-            await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: customer.paymentCts.Token);
         }
 
-        await UniTask.Delay(TimeSpan.FromSeconds(0.15f));
+        await UniTask.Delay(TimeSpan.FromSeconds(0.15f), cancellationToken: customer.paymentCts.Token);
         bag.PlayCloseAnim();
 
         // ¼Õ´Ô ÅðÀå
@@ -232,7 +233,7 @@ public class CustomerManager : MonoBehaviour
         customer.SetActionOnPushCarriableObject(null);
         customer.PushCarriableObject(bag);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(0.4f));
+        await UniTask.Delay(TimeSpan.FromSeconds(0.4f), cancellationToken: customer.paymentCts.Token);
 
         bag.SetParent(customer.transform);
         bag.MoveToTargetWithCurve(new Vector3(0f, 0.819999993f, 0.730000019f), 0.2f, targetRot: 0f, onComplete: (carriableObject) =>

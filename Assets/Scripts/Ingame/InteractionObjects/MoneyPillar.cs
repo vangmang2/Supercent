@@ -22,12 +22,8 @@ public class MoneyPillar : InteractionObject
         moneyStacks.Push(moneyStack);
     }
 
-    public void DespawnMoneyStack()
+    public void DespawnMoneyStack(MoneyStack moneyStack)
     {
-        if (moneyStacks.Count <= 0)
-            return;
-
-        var moneyStack = moneyStacks.Pop();
         moneyStackPool.Despawn(moneyStack);
     }
 
@@ -67,7 +63,7 @@ public class MoneyPillar : InteractionObject
             var moneyStack = moneyStacks.Pop();
             var moneyAmount = moneyAmountStack.Pop();
             stackCount--;
-            moneyStack.PlayMoneyToPlayerAnim(player.position);
+            moneyStack.PlayMoneyToPlayerAnim(player.position, DespawnMoneyStack);
             player.IncreaseMoney(moneyAmount);
             cooldown = 0f;
         }

@@ -71,7 +71,6 @@ public class Pos : InteractionObject
 
     public override void OnInteractantEnter(Interactant interactant)
     {
-        cooldown = 1.5f;
         casherList.Add(interactant);
     }
 

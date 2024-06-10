@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Lean.Pool;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,16 +29,18 @@ public class MoneyStack : MonoBehaviour, IPoolable
         for (int i = 0; i < tfMoneyList.Count; i++)
         {
             var originPos = originPosList[i];
-            tfMoneyList[i].position = originPos;
+            var tfMoney = tfMoneyList[i];
+            tfMoney.position = originPos;
+            tfMoney.gameObject.SetActive(true);
         }
     }
 
-    public void PlayMoneyToPlayerAnim(Vector3 target)
+    public void PlayMoneyToPlayerAnim(Vector3 target, Action<MoneyStack> callback)
     {
-        InvokePlayMoneyToPlayerAnim(target).Forget();
+        InvokePlayMoneyToPlayerAnim(target, callback).Forget();
     }
 
-    async UniTaskVoid InvokePlayMoneyToPlayerAnim(Vector3 target)
+    async UniTaskVoid InvokePlayMoneyToPlayerAnim(Vector3 target, Action<MoneyStack> callback)
     {
         foreach (var tfMoney in tfMoneyList)
         {
@@ -59,5 +62,6 @@ public class MoneyStack : MonoBehaviour, IPoolable
             }
             tfMoney.gameObject.SetActive(false);
         }
+        callback?.Invoke(this);
     }
 }
