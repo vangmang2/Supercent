@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,15 +11,13 @@ public class MoneyPillar : InteractionObject
     Stack<int> moneyAmountStack = new Stack<int>();
 
     const float stackGap = 0.27f;
-
-    int stackCount;
+    public bool isPlayerOn { get; private set; }
 
     public void SpawnMoneyStack()
     {
-        var targetPos = transform.position + new Vector3(0f, stackCount * stackGap, 0f);
+        var targetPos = transform.position + new Vector3(0f, moneyStacks.Count * stackGap, 0f);
         var moneyStack = moneyStackPool.Spawn(targetPos, Quaternion.identity, null);
 
-        stackCount++;
         moneyStacks.Push(moneyStack);
     }
 
@@ -51,8 +50,9 @@ public class MoneyPillar : InteractionObject
     float cooldown;
     private void Update()
     {
+        isPlayerOn = player != null;
         cooldown += Time.deltaTime;
-        if (cooldown >= 0.15f)
+        if (cooldown >= 0.02f)
         {
             if (player == null)
                 return;
@@ -62,7 +62,6 @@ public class MoneyPillar : InteractionObject
 
             var moneyStack = moneyStacks.Pop();
             var moneyAmount = moneyAmountStack.Pop();
-            stackCount--;
             moneyStack.PlayMoneyToPlayerAnim(player.position, DespawnMoneyStack);
             player.IncreaseMoney(moneyAmount);
             cooldown = 0f;

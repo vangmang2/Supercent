@@ -1,4 +1,6 @@
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,6 +10,7 @@ public class Table : InteractionObject
 {
     [SerializeField] TMP_Text txtAmount;
     [SerializeField] List<GameObject> goLockList, goUnlockList;
+    [SerializeField] MoneyPillar moneyPillar;
     int currUnlockAmount = 5;
 
     Queue<Customer> waitingQueue = new Queue<Customer>();
@@ -44,6 +47,21 @@ public class Table : InteractionObject
     public override Vector3 GetPos(int index)
     {
         return Vector3.zero;
+    }
+
+    public void IncreaseMoney(int amount, int loopCount = 1, float delay = 0.1f)
+    {
+        InvokeIncreaseMoney(amount, loopCount, delay).Forget();
+    }
+
+    async UniTaskVoid InvokeIncreaseMoney(int amount, int loopCount, float delay)
+    {
+        for (int i = 0; i < loopCount; i++)
+        {
+            moneyPillar.IncreaseMoney(amount);
+            moneyPillar.SpawnMoneyStack();
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+        }
     }
 
     Player player;

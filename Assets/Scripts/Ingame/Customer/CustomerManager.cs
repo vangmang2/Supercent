@@ -183,7 +183,8 @@ public class CustomerManager : MonoBehaviour
 
         currCustomerCount--;
 
-        while(customer.currCOCount > 0)
+        var croassantCount = customer.currCOCount;
+        while (customer.currCOCount > 0)
         {
             var croassant = customer.PopCarriableObject(SoundType.none);
             croassantPool.Despawn(croassant as Croassant);
@@ -196,6 +197,7 @@ public class CustomerManager : MonoBehaviour
                 .MoveToTarget(new Vector3(0.310000002f, 0.50999999f, 9.71000004f))
                 .SetActionOnMoveEnd(DespawnCustomer);
 
+        table.IncreaseMoney(5, croassantCount);
         // 테이블에 쓰레기 효과 추가
     }
 
