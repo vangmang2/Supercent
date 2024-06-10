@@ -9,7 +9,9 @@ using UnityEngine;
 public class Table : InteractionObject
 {
     [SerializeField] TMP_Text txtAmount;
+    [SerializeField] ParticleSystem vfx_Clean;
     [SerializeField] List<GameObject> goLockList, goUnlockList;
+    [SerializeField] GameObject goTrash;
     [SerializeField] MoneyPillar moneyPillar;
     int currUnlockAmount = 5;
 
@@ -27,6 +29,16 @@ public class Table : InteractionObject
         }
     }
 
+    public void SetActiveTrash(bool enable)
+    {
+        isClean = !enable;
+        goTrash.SetActive(enable);
+    }
+
+    public void PlayCleanSfx()
+    {
+        vfx_Clean.Play();
+    }
 
     private void Start()
     {
@@ -34,24 +46,22 @@ public class Table : InteractionObject
         txtAmount.SetText(currUnlockAmount.ToString());
     }
 
-    public void EnqueueCustomer(Customer customer)
+    public Table EnqueueCustomer(Customer customer)
     {
         waitingQueue.Enqueue(customer);
+        return this;
     }
 
-    public void Dequeue()
+    public Table Dequeue()
     {
         waitingQueue.Dequeue();
+        return this;
     }
 
-    public override Vector3 GetPos(int index)
-    {
-        return Vector3.zero;
-    }
-
-    public void IncreaseMoney(int amount, int loopCount = 1, float delay = 0.1f)
+    public Table IncreaseMoney(int amount, int loopCount = 1, float delay = 0.1f)
     {
         InvokeIncreaseMoney(amount, loopCount, delay).Forget();
+        return this;
     }
 
     async UniTaskVoid InvokeIncreaseMoney(int amount, int loopCount, float delay)
@@ -63,11 +73,24 @@ public class Table : InteractionObject
             await UniTask.Delay(TimeSpan.FromSeconds(delay));
         }
     }
+    public override Vector3 GetPos(int index)
+    {
+        return Vector3.zero;
+    }
 
     Player player;
     public override void OnInteractantEnter(Interactant interactant)
     {
         player = interactant as Player;
+
+        if (!isUnlocked)
+            return;
+
+        if (isClean)
+            return;
+
+        SetActiveTrash(false);
+        PlayCleanSfx();
     }
 
     public override void OnInteractantExit(Interactant interactant)

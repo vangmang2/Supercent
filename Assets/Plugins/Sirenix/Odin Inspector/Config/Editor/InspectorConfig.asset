@@ -18,4 +18,4 @@ MonoBehaviour:
   drawingConfig:
     configs:
     - DrawnTypeName: Table, Assembly-CSharp
-      EditorTypeName: 
+      EditorTypeName: Sirenix.OdinInspector.Editor.OdinEditor, Sirenix.OdinInspector.Editor
